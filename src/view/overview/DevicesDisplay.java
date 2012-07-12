@@ -2,9 +2,6 @@
 
 package view.overview;
 
-
 public class DevicesDisplay {
-	
-
 
 }

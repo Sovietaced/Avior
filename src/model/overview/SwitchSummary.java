@@ -6,11 +6,11 @@ public class SwitchSummary {
 
 	String dpid, manufacturer;
 	int packetCount, byteCount, flowCount;
-	
-	public SwitchSummary(String id){
-		dpid = id; 
+
+	public SwitchSummary(String id) {
+		dpid = id;
 	}
-	
+
 	public String getDpid() {
 		return dpid;
 	}
@@ -51,11 +51,13 @@ public class SwitchSummary {
 		this.flowCount = flowCount;
 	}
 
-	public void setVendor(String man){
+	public void setVendor(String man) {
 		this.manufacturer = man;
 	}
-	public String toString(){
-		return "Switch: " + this.dpid + " | Vendor: " + this.manufacturer + " | Packets: " 
-	+ this.packetCount + " | Bytes: " + this.byteCount + " | Flows: " + this.flowCount;
+
+	public String toString() {
+		return "Switch: " + this.dpid + " | Vendor: " + this.manufacturer
+				+ " | Packets: " + this.packetCount + " | Bytes: "
+				+ this.byteCount + " | Flows: " + this.flowCount;
 	}
 }

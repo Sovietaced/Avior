@@ -1,70 +1,70 @@
 package model.tools.flowmanager;
 
 public class Action {
-	
-	String type,param, value;
-	
-	public Action(String t){
-		
-		if(t.equals("output"))
+
+	String type, param, value;
+
+	public Action(String t) {
+
+		if (t.equals("output"))
 			this.param = "Port";
-		if(t.equals("enqueue"))
+		if (t.equals("enqueue"))
 			this.param = "Port:Queue ID";
-		if(t.equals("set-vlan-id"))
+		if (t.equals("set-vlan-id"))
 			this.param = "VLAN ID";
-		if(t.equals("set-vlan-priority"))
+		if (t.equals("set-vlan-priority"))
 			this.param = "VLAN PCP";
-		if(t.equals("set-src-mac"))
+		if (t.equals("set-src-mac"))
 			this.param = "Data Layer Address";
-		if(t.equals("set-dst-mac"))
+		if (t.equals("set-dst-mac"))
 			this.param = "Data Layer Address";
-		if(t.equals("set-tos-bits"))
+		if (t.equals("set-tos-bits"))
 			this.param = "Network Type Of Service";
-		if(t.equals("set-src-ip"))
+		if (t.equals("set-src-ip"))
 			this.param = "Network Address";
-		if(t.equals("set-dst-ip"))
+		if (t.equals("set-dst-ip"))
 			this.param = "Network Address";
-		if(t.equals("set-src-port"))
+		if (t.equals("set-src-port"))
 			this.param = "Transport Port";
-		if(t.equals("set-dst-port"))
+		if (t.equals("set-dst-port"))
 			this.param = "Transport Port";
 		this.type = t;
 	}
-	
-	public Action(String t, String v){
-		if(t.equals("output"))
+
+	public Action(String t, String v) {
+		if (t.equals("output"))
 			this.param = "Port";
-		if(t.equals("enqueue"))
+		if (t.equals("enqueue"))
 			this.param = "Port:Queue ID";
-		if(t.equals("set-vlan-id"))
+		if (t.equals("set-vlan-id"))
 			this.param = "VLAN ID";
-		if(t.equals("set-vlan-priority"))
+		if (t.equals("set-vlan-priority"))
 			this.param = "VLAN PCP";
-		if(t.equals("set-src-mac"))
+		if (t.equals("set-src-mac"))
 			this.param = "Data Layer Address";
-		if(t.equals("set-dst-mac"))
+		if (t.equals("set-dst-mac"))
 			this.param = "Data Layer Address";
-		if(t.equals("set-tos-bits"))
+		if (t.equals("set-tos-bits"))
 			this.param = "Network Type Of Service";
-		if(t.equals("set-src-ip"))
+		if (t.equals("set-src-ip"))
 			this.param = "Network Address";
-		if(t.equals("set-dst-ip"))
+		if (t.equals("set-dst-ip"))
 			this.param = "Network Address";
-		if(t.equals("set-src-port"))
+		if (t.equals("set-src-port"))
 			this.param = "Transport Port";
-		if(t.equals("set-dst-port"))
+		if (t.equals("set-dst-port"))
 			this.param = "Transport Port";
-		
+
 		this.type = t;
 		this.value = v;
 	}
-	
-	public Action(String t, String v, String p){
+
+	public Action(String t, String v, String p) {
 		this.type = t;
 		this.value = v;
 		this.param = p;
 	}
-	
+
 	public String getParam() {
 		return param;
 	}
@@ -88,9 +88,9 @@ public class Action {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
-	public String serialize(){
-		if(type.equals("strip-vlan")){
+
+	public String serialize() {
+		if (type.equals("strip-vlan")) {
 			return type;
 		}
 		return type + "=" + value;

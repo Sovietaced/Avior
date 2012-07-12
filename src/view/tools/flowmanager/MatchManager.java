@@ -80,27 +80,27 @@ public class MatchManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if(matchTableFormat != null){
+
+		if (matchTableFormat != null) {
 			for (String[] s : matchTableFormat) {
 				new TableItem(table_match, SWT.NO_FOCUS).setText(s);
 			}
 		}
 	}
-	
-//	protected void populateNewMatchTable() {
-//
-//		// Clear the tables of any data
-//		table_match.removeAll();
-//
-//		matchTableFormat = MatchToTable.getNewMatchTableFormat();
-//
-//		if (matchTableFormat != null) {
-//			for (String[] s : matchTableFormat) {
-//				new TableItem(table_match, SWT.NO_FOCUS).setText(s);
-//			}
-//		}
-//	}
+
+	// protected void populateNewMatchTable() {
+	//
+	// // Clear the tables of any data
+	// table_match.removeAll();
+	//
+	// matchTableFormat = MatchToTable.getNewMatchTableFormat();
+	//
+	// if (matchTableFormat != null) {
+	// for (String[] s : matchTableFormat) {
+	// new TableItem(table_match, SWT.NO_FOCUS).setText(s);
+	// }
+	// }
+	// }
 
 	/**
 	 * Create contents of the window.
@@ -154,8 +154,8 @@ public class MatchManager {
 		Button btnRefresh = new Button(composite, SWT.NONE);
 		btnRefresh.setBounds(10, 0, 91, 29);
 		btnRefresh.setText("Refresh");
-		btnRefresh.addSelectionListener(new SelectionAdapter(){
-			public void widgetSelected(SelectionEvent e){
+		btnRefresh.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
 				populateMatchTable();
 			}
 		});
@@ -163,22 +163,23 @@ public class MatchManager {
 		Button btnClear = new Button(composite, SWT.NONE);
 		btnClear.setBounds(122, 0, 109, 29);
 		btnClear.setText("Default Values");
-		btnClear.addSelectionListener(new SelectionAdapter(){
-			public void widgetSelected(SelectionEvent e){
-//				populateNewMatchTable();
+		btnClear.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// populateNewMatchTable();
 			}
 		});
 
 		Button btnSave = new Button(composite, SWT.NONE);
 		btnSave.setBounds(254, 0, 91, 29);
 		btnSave.setText("Save");
-		btnSave.addSelectionListener(new SelectionAdapter(){
-			public void widgetSelected(SelectionEvent e){
-				FlowManager.setMatch(MatchManagerPusher.addMatch(table_match.getItems()));				
+		btnSave.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				FlowManager.setMatch(MatchManagerPusher.addMatch(table_match
+						.getItems()));
 				// Dispose the editor do it doesn't leave a ghost table item
-		    	  if(editor.getEditor() != null){
-			    		editor.getEditor().dispose();
-		    	  }
+				if (editor.getEditor() != null) {
+					editor.getEditor().dispose();
+				}
 			}
 		});
 
@@ -192,7 +193,7 @@ public class MatchManager {
 		table_match.setBounds(0, 0, 381, 503);
 		table_match.setHeaderVisible(true);
 		table_match.setLinesVisible(true);
-		
+
 		editor = new TableEditor(table_match);
 		// The editor must have the same size as the cell and must
 		// not be any smaller than 50 pixels.

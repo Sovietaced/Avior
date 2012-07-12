@@ -20,7 +20,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
 
-public class Startup{
+public class Startup {
 
 	protected static Shell shell;
 	protected static Display display;
@@ -28,6 +28,7 @@ public class Startup{
 
 	/**
 	 * Create the dialog.
+	 * 
 	 * @param parent
 	 * @param style
 	 */
@@ -37,6 +38,7 @@ public class Startup{
 
 	/**
 	 * Open the dialog.
+	 * 
 	 * @return the result
 	 */
 	public void open() {
@@ -52,41 +54,39 @@ public class Startup{
 		shell.dispose();
 	}
 
-	 public static void connect(){
-		 int timeOut = 5000;
-			try {
-				if(InetAddress.getByName(txtIp.getText()).isReachable(timeOut)){
-					try{
-					 new Gui(txtIp.getText());
-					}
-					catch(Exception swaggg){
-						swaggg.printStackTrace();
-						MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-				          mb.setText("Tacos!");
-				          mb.setMessage("swaggggg.");
-				          mb.open();
-					}
-				 }
-				else{
-					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-			          mb.setText("Error!");
-			          mb.setMessage("Failed to reach the remote IP address. Please make sure you have entered the correct address.");
-			          mb.open();
+	public static void connect() {
+		int timeOut = 5000;
+		try {
+			if (InetAddress.getByName(txtIp.getText()).isReachable(timeOut)) {
+				try {
+					new Gui(txtIp.getText());
+				} catch (Exception swaggg) {
+					swaggg.printStackTrace();
+					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+							| SWT.OK);
+					mb.setText("Tacos!");
+					mb.setMessage("swaggggg.");
+					mb.open();
 				}
-			} 
-			catch (UnknownHostException e1) {
+			} else {
 				MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		          mb.setText("Error!");
-		          mb.setMessage("Unknown host. Please make sure you have entered the correct address.");
-		          mb.open();
-			} 
-			catch (IOException e1) {
-				MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		          mb.setText("Error!");
-		          mb.setMessage("Failed to reach the remote IP address");
-		          mb.open();
+				mb.setText("Error!");
+				mb.setMessage("Failed to reach the remote IP address. Please make sure you have entered the correct address.");
+				mb.open();
 			}
-	 }
+		} catch (UnknownHostException e1) {
+			MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+			mb.setText("Error!");
+			mb.setMessage("Unknown host. Please make sure you have entered the correct address.");
+			mb.open();
+		} catch (IOException e1) {
+			MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+			mb.setText("Error!");
+			mb.setMessage("Failed to reach the remote IP address");
+			mb.open();
+		}
+	}
+
 	private void createContents() {
 		shell = new Shell();
 		shell.setSize(450, 300);
@@ -95,13 +95,13 @@ public class Startup{
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
-		
+
 		MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
 		mntmNewSubmenu.setText("File");
-		
+
 		Menu menu_1 = new Menu(mntmNewSubmenu);
 		mntmNewSubmenu.setMenu(menu_1);
-		
+
 		MenuItem mntmClose = new MenuItem(menu_1, SWT.NONE);
 		mntmClose.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -110,52 +110,54 @@ public class Startup{
 			}
 		});
 		mntmClose.setText("Close");
-		
+
 		MenuItem mntmAbout = new MenuItem(menu, SWT.CASCADE);
 		mntmAbout.setText("Help");
-		
+
 		Menu menu_2 = new Menu(mntmAbout);
 		mntmAbout.setMenu(menu_2);
-		
+
 		MenuItem mntmInfo = new MenuItem(menu_2, SWT.NONE);
 		mntmInfo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				 new About();
+				new About();
 			}
 		});
 		mntmInfo.setText("About");
-		
-		try{	
-			ImageData ideaImage = new ImageData(getClass().getResourceAsStream("floodlight.png"));
+
+		try {
+			ImageData ideaImage = new ImageData(getClass().getResourceAsStream(
+					"floodlight.png"));
 			Image floodlight = new Image(display, ideaImage);
 			Label lblNewLabel_2 = new Label(shell, SWT.NONE);
 			lblNewLabel_2.setBounds(50, 20, 250, 50);
 			lblNewLabel_2.setImage(floodlight);
-			}
-			catch(Exception j){
-				System.out.println("OSX Error");
-			}
-		
+		} catch (Exception j) {
+			System.out.println("OSX Error");
+		}
+
 		Label lblEnterTheIp = new Label(shell, SWT.NONE);
 		lblEnterTheIp.setBounds(37, 79, 344, 17);
-		lblEnterTheIp.setText("Enter the IP address of the controller to begin");
-		
+		lblEnterTheIp
+				.setText("Enter the IP address of the controller to begin");
+
 		txtIp = new Text(shell, SWT.BORDER);
 		txtIp.setBounds(63, 102, 120, 27);
-		// Add a listener for the text box, if enter is pressed we attempt to connect
-		txtIp.addTraverseListener(new TraverseListener(){
-			public void keyTraversed(TraverseEvent e){
-				if(e.detail == SWT.TRAVERSE_RETURN){
+		// Add a listener for the text box, if enter is pressed we attempt to
+		// connect
+		txtIp.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_RETURN) {
 					connect();
 				}
 			}
 		});
-		
+
 		Label lblIp = new Label(shell, SWT.NONE);
 		lblIp.setBounds(40, 108, 17, 27);
 		lblIp.setText("IP:");
-		
+
 		Button btnLaunch = new Button(shell, SWT.NONE);
 		btnLaunch.setBounds(206, 102, 91, 29);
 		btnLaunch.setText("Launch");

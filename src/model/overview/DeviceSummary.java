@@ -3,11 +3,11 @@ package model.overview;
 import java.util.Date;
 
 public class DeviceSummary {
-	
+
 	String macAddress, ipv4, attachedSwitch;
 	int switchPort;
 	Date lastSeen;
-	
+
 	public String getMacAddress() {
 		return macAddress;
 	}
@@ -48,11 +48,14 @@ public class DeviceSummary {
 		this.lastSeen = lastSeen;
 	}
 
-	public String toString(){
-		return "Device: " + this.macAddress + " | IPv4: " + this.ipv4 + " | Attached Switch: " 
-				+ this.attachedSwitch + " | Switch Port: " + this.switchPort + " | Last Seen: " + this.lastSeen ;
+	public String toString() {
+		return "Device: " + this.macAddress + " | IPv4: " + this.ipv4
+				+ " | Attached Switch: " + this.attachedSwitch
+				+ " | Switch Port: " + this.switchPort + " | Last Seen: "
+				+ this.lastSeen;
 	}
-	public DeviceSummary(String mac){
-		macAddress = mac;	
+
+	public DeviceSummary(String mac) {
+		macAddress = mac;
 	}
 }
