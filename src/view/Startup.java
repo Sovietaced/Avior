@@ -58,25 +58,27 @@ public class Startup {
 		int timeOut = 5000;
 		try {
 			if (InetAddress.getByName(txtIp.getText()).isReachable(timeOut)) {
-				//try {
+				// try {
 				shell.setVisible(false);
 				new Thread(new Runnable() {
-				      public void run() {
-				            Display.getDefault().asyncExec(new Runnable() {
-				               public void run() {
-				            	   new Gui(txtIp.getText());
-				               }
-				            });
-				      }
-				   }).start();
-//				} catch (Exception swaggg) {
-//					swaggg.printStackTrace();
-//					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-//							| SWT.OK);
-//					mb.setText("Tacos!");
-//					mb.setMessage("swaggggg.");
-//					mb.open();
-//				}
+					@Override
+					public void run() {
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								new Gui(txtIp.getText());
+							}
+						});
+					}
+				}).start();
+				// } catch (Exception swaggg) {
+				// swaggg.printStackTrace();
+				// MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+				// | SWT.OK);
+				// mb.setText("Tacos!");
+				// mb.setMessage("swaggggg.");
+				// mb.open();
+				// }
 			} else {
 				MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 				mb.setText("Error!");
@@ -156,6 +158,7 @@ public class Startup {
 		// Add a listener for the text box, if enter is pressed we attempt to
 		// connect
 		txtIp.addTraverseListener(new TraverseListener() {
+			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_RETURN) {
 					connect();

@@ -55,6 +55,7 @@ public class SwitchSummary {
 		this.manufacturer = man;
 	}
 
+	@Override
 	public String toString() {
 		return "Switch: " + this.dpid + " | Vendor: " + this.manufacturer
 				+ " | Packets: " + this.packetCount + " | Bytes: "

@@ -186,6 +186,7 @@ public class ActionManager {
 		btnRefresh.setBounds(10, 0, 91, 29);
 		btnRefresh.setText("Refresh");
 		btnRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				populateActionTree();
 			}
@@ -209,6 +210,7 @@ public class ActionManager {
 				"set-dst-mac", "set-tos-bits", "set-src-ip", "set-dst-ip IP",
 				"set-src-port", "set-dst-port" });
 		combo.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				int newSelection = combo.getSelectionIndex();
 				actionType = combo.getItem(newSelection);
@@ -226,6 +228,7 @@ public class ActionManager {
 		btnRemoveAllActions.setBounds(406, 5, 151, 29);
 		btnRemoveAllActions.setText("Remove All Actions");
 		btnRemoveAllActions.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ActionManagerPusher.removeAllActions();
 				populateActionTree();
@@ -236,6 +239,7 @@ public class ActionManager {
 		btnSave.setBounds(206, 5, 91, 29);
 		btnSave.setText("Save");
 		btnSave.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (currAction == null && newAction == false) {
 					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
@@ -293,6 +297,7 @@ public class ActionManager {
 		btnRemove.setBounds(309, 5, 91, 29);
 		btnRemove.setText("Remove");
 		btnRemove.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// Remove the action
 				if (newAction == false) {
@@ -315,6 +320,7 @@ public class ActionManager {
 		tree = new Tree(composite_2, SWT.BORDER);
 		tree.setBounds(0, 0, 215, 224);
 		tree.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// Dispose the editor do it doesn't leave a ghost table item
 				if (editor.getEditor() != null) {
@@ -345,6 +351,7 @@ public class ActionManager {
 		editor.minimumWidth = 50;
 
 		table_action.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				// Clean up any previous editor control
@@ -362,6 +369,7 @@ public class ActionManager {
 				Text newEditor = new Text(table_action, SWT.NONE);
 				newEditor.setText(item.getText(EDITABLECOLUMN));
 				newEditor.addModifyListener(new ModifyListener() {
+					@Override
 					public void modifyText(ModifyEvent me) {
 						Text text = (Text) editor.getEditor();
 						editor.getItem()

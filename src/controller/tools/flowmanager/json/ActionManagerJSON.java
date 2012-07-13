@@ -9,12 +9,11 @@ import java.util.List;
 
 import model.tools.flowmanager.Action;
 
-import org.openflow.util.HexString;
-
 import view.Gui;
 import avior.json.JSONArray;
 import avior.json.JSONException;
 import avior.json.JSONObject;
+import avior.util.HexString;
 import controller.Deserializer;
 
 public class ActionManagerJSON {
@@ -30,7 +29,7 @@ public class ActionManagerJSON {
 		// Get the array of actions
 		obj = Deserializer.readJsonObjectFromURL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/list/" + dpid + "/json");
-		if(!obj.getJSONObject(dpid).getJSONObject(flowName).isNull("actions")){
+		if (!obj.getJSONObject(dpid).getJSONObject(flowName).isNull("actions")) {
 			json = obj.getJSONObject(dpid).getJSONObject(flowName)
 					.getJSONArray("actions");
 

@@ -155,6 +155,7 @@ public class MatchManager {
 		btnRefresh.setBounds(10, 0, 91, 29);
 		btnRefresh.setText("Refresh");
 		btnRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				populateMatchTable();
 			}
@@ -164,6 +165,7 @@ public class MatchManager {
 		btnClear.setBounds(122, 0, 109, 29);
 		btnClear.setText("Default Values");
 		btnClear.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// populateNewMatchTable();
 			}
@@ -173,6 +175,7 @@ public class MatchManager {
 		btnSave.setBounds(254, 0, 91, 29);
 		btnSave.setText("Save");
 		btnSave.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FlowManager.setMatch(MatchManagerPusher.addMatch(table_match
 						.getItems()));
@@ -202,6 +205,7 @@ public class MatchManager {
 		editor.minimumWidth = 50;
 
 		table_match.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				// Clean up any previous editor control
@@ -219,6 +223,7 @@ public class MatchManager {
 				Text newEditor = new Text(table_match, SWT.NONE);
 				newEditor.setText(item.getText(EDITABLECOLUMN));
 				newEditor.addModifyListener(new ModifyListener() {
+					@Override
 					public void modifyText(ModifyEvent me) {
 						Text text = (Text) editor.getEditor();
 						editor.getItem()

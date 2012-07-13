@@ -204,6 +204,7 @@ public class FlowManager {
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 		shell.addListener(SWT.Close, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				int style = SWT.APPLICATION_MODAL | SWT.YES | SWT.NO;
 				MessageBox messageBox = new MessageBox(shell, style);
@@ -267,6 +268,7 @@ public class FlowManager {
 		table_flow.setHeaderVisible(true);
 		table_flow.setLinesVisible(true);
 		table_flow.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (table_flow.getSelection()[0].getText().equals("Actions")) {
 					new ActionManager();
@@ -285,6 +287,7 @@ public class FlowManager {
 		editor.minimumWidth = 50;
 
 		table_flow.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// Clean up any previous editor control
 				Control oldEditor = editor.getEditor();
@@ -301,6 +304,7 @@ public class FlowManager {
 				Text newEditor = new Text(table_flow, SWT.NONE);
 				newEditor.setText(item.getText(EDITABLECOLUMN));
 				newEditor.addModifyListener(new ModifyListener() {
+					@Override
 					public void modifyText(ModifyEvent me) {
 						Text text = (Text) editor.getEditor();
 						editor.getItem()
@@ -324,9 +328,11 @@ public class FlowManager {
 		Composite composite_2 = new Composite(composite, SWT.NONE);
 		composite_2.setBounds(10, 0, 194, 742);
 
-		tree_switches = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS | SWT.NONE);
+		tree_switches = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS
+				| SWT.NONE);
 		tree_switches.setBounds(0, 33, 185, 268);
 		tree_switches.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				populateFlowTree(tree_switches.getSelection()[0].getText());
 			}
@@ -335,6 +341,7 @@ public class FlowManager {
 		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS);
 		tree_flows.setBounds(0, 330, 185, 412);
 		tree_flows.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					flow = FlowManagerJSON.getFlow(
@@ -367,6 +374,7 @@ public class FlowManager {
 		btnRefresh.setBounds(3, 3, 125, 29);
 		btnRefresh.setText("Refresh");
 		btnRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				populateSwitchTree();
 			}
@@ -376,6 +384,7 @@ public class FlowManager {
 		btnNewFLow.setBounds(131, 3, 125, 29);
 		btnNewFLow.setText("New Flow");
 		btnNewFLow.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setupNewFlow();
 			}
@@ -385,6 +394,7 @@ public class FlowManager {
 		btnSave.setBounds(259, 3, 125, 29);
 		btnSave.setText("Push");
 		btnSave.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				System.out.println(flow.serialize());
 				try {
@@ -408,8 +418,7 @@ public class FlowManager {
 							mb.setText("Status");
 							mb.setMessage(response);
 							mb.open();
-						}
-						else{
+						} else {
 							MessageBox mb = new MessageBox(shell,
 									SWT.ICON_ERROR | SWT.OK);
 							mb.setText("Error");
@@ -435,31 +444,33 @@ public class FlowManager {
 		btnDeleteFlow.setBounds(515, 3, 125, 29);
 		btnDeleteFlow.setText("Delete Flow");
 		btnDeleteFlow.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
+				try {
 					try {
-						try {
-							String response = FlowManagerPusher.remove(flow);
-							if (response.equals("Entry " + flow.getName() + " deleted"))
-								populateFlowTree(flow.getSwitch());
+						String response = FlowManagerPusher.remove(flow);
+						if (response.equals("Entry " + flow.getName()
+								+ " deleted"))
+							populateFlowTree(flow.getSwitch());
 
-							// Dispose the editor do it doesn't leave a ghost table
-							// item
-							if (editor.getEditor() != null)
-								editor.getEditor().dispose();
+						// Dispose the editor do it doesn't leave a ghost table
+						// item
+						if (editor.getEditor() != null)
+							editor.getEditor().dispose();
 
-							MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-									| SWT.OK);
-							mb.setText("Status");
-							mb.setMessage(response);
-							mb.open();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					} catch (JSONException e1) {
+						MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+								| SWT.OK);
+						mb.setText("Status");
+						mb.setMessage(response);
+						mb.open();
+					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 
@@ -467,21 +478,22 @@ public class FlowManager {
 		btnDeleteAllFlows.setBounds(643, 3, 125, 29);
 		btnDeleteAllFlows.setText("Delete All Flows");
 		btnDeleteAllFlows.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-					
-							try {
-								FlowManagerPusher.removeAll(getCurrSwitch());
-							} catch (IOException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (JSONException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							
+
+				try {
+					FlowManagerPusher.removeAll(getCurrSwitch());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 			}
 		});
-		
+
 		populateSwitchTree();
 
 		shell.setLayout(gl_shell);

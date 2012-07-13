@@ -48,6 +48,7 @@ public class DeviceSummary {
 		this.lastSeen = lastSeen;
 	}
 
+	@Override
 	public String toString() {
 		return "Device: " + this.macAddress + " | IPv4: " + this.ipv4
 				+ " | Attached Switch: " + this.attachedSwitch

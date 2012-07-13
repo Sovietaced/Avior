@@ -5,21 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.eclipse.swt.widgets.TableItem;
 
 import avior.json.JSONException;
 import avior.json.JSONObject;
 
-import model.tools.flowmanager.Action;
 import model.tools.flowmanager.Flow;
 
 import view.Gui;
@@ -88,7 +80,7 @@ public class FlowManagerPusher {
 		// Return result string from key "status"
 		return json.getString("status");
 	}
-	
+
 	public static void removeAll(String dpid) throws IOException, JSONException {
 		URL url = new URL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/clear/" + dpid + "/json");

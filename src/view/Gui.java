@@ -2,11 +2,6 @@ package view;
 
 import avior.json.JSONException;
 
-import java.util.Map;
-import net.floodlightcontroller.core.internal.IOFSwitch;
-import net.floodlightcontroller.core.module.IFloodlightService;
-import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,11 +35,8 @@ public class Gui {
 	protected Table switches_table;
 	protected Table devices_table;
 	protected Composite controllerOverview;
-	protected DeviceManagerImpl deviceManager;
 	protected Label lblInsertHostname, lblInsertHealthy, lblInsertJvmMemory,
 			lblInsertModules;
-	protected IFloodlightService floodlightProvider;
-	protected Map<Long, IOFSwitch> switches;
 	protected boolean dispose;
 	protected Display display;
 	public static String IP;

@@ -8,8 +8,6 @@ import java.util.List;
 import controller.Deserializer;
 
 import model.overview.DeviceSummary;
-import model.overview.SwitchSummary;
-
 import avior.json.JSONArray;
 import avior.json.JSONException;
 import avior.json.JSONObject;

@@ -2,8 +2,6 @@ package controller.tools.flowmanager.table;
 
 import java.io.IOException;
 
-import controller.tools.flowmanager.json.MatchManagerJSON;
-
 import model.tools.flowmanager.Match;
 import view.tools.flowmanager.FlowManager;
 import avior.json.JSONException;
