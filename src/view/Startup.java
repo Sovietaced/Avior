@@ -24,7 +24,7 @@ public class Startup {
 
 	protected static Shell shell;
 	protected static Display display;
-	private static Text txtIp;
+	protected static Text txtIp;
 
 	/**
 	 * Create the dialog.
@@ -58,16 +58,25 @@ public class Startup {
 		int timeOut = 5000;
 		try {
 			if (InetAddress.getByName(txtIp.getText()).isReachable(timeOut)) {
-				try {
-					new Gui(txtIp.getText());
-				} catch (Exception swaggg) {
-					swaggg.printStackTrace();
-					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-							| SWT.OK);
-					mb.setText("Tacos!");
-					mb.setMessage("swaggggg.");
-					mb.open();
-				}
+				//try {
+				shell.setVisible(false);
+				new Thread(new Runnable() {
+				      public void run() {
+				            Display.getDefault().asyncExec(new Runnable() {
+				               public void run() {
+				            	   new Gui(txtIp.getText());
+				               }
+				            });
+				      }
+				   }).start();
+//				} catch (Exception swaggg) {
+//					swaggg.printStackTrace();
+//					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+//							| SWT.OK);
+//					mb.setText("Tacos!");
+//					mb.setMessage("swaggggg.");
+//					mb.open();
+//				}
 			} else {
 				MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 				mb.setText("Error!");

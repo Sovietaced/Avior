@@ -70,11 +70,15 @@ public class FlowManagerJSON {
 		flow.setName(flowName);
 		flow.setActions(ActionManagerJSON.getActions(dpid, flowName));
 		flow.setMatch(MatchManagerJSON.getMatch(dpid, flowName));
-		flow.setPriority(String.valueOf(obj.getInt("priority")));
+		if(obj.getInt("priority") != 32767)
+			flow.setPriority(String.valueOf(obj.getInt("priority")));
 		flow.setCookie(String.valueOf(obj.getLong("cookie")));
-		flow.setIdleTimeOut(String.valueOf(obj.getInt("idleTimeout")));
-		flow.setHardTimeOut(String.valueOf(obj.getInt("hardTimeout")));
-		flow.setOutPort(String.valueOf(obj.getInt("outPort")));
+		if(obj.getInt("idleTimeout") != 0)
+			flow.setIdleTimeOut(String.valueOf(obj.getInt("idleTimeout")));
+		if(obj.getInt("hardTimeout") != 0)
+			flow.setHardTimeOut(String.valueOf(obj.getInt("hardTimeout")));
+		if(obj.getInt("outPort") != -1)
+			flow.setOutPort(String.valueOf(obj.getInt("outPort")));
 
 		System.out.println(flow.serialize());
 

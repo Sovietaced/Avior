@@ -32,7 +32,8 @@ public class Controller {
 				info[1] = "No";
 			}
 		} catch (IOException e) {
-			System.out.println("Fail sauce!");
+			e.printStackTrace();
+			System.out.println("Failed to get read JSON Object");
 		}
 
 		// Get the packets/bytes/flows information for each switch and add it to
@@ -44,7 +45,8 @@ public class Controller {
 			long total = obj.getLong("total");
 			info[2] = (formatLong(free) + " free of " + formatLong(total));
 		} catch (IOException e) {
-			System.out.println("Fail sauce!");
+			e.printStackTrace();
+			System.out.println("Failed to get read JSON Object");
 		}
 
 		// Get the packets/bytes/flows information for each switch and add it to
@@ -66,7 +68,8 @@ public class Controller {
 			}
 			info[3] = modules;
 		} catch (IOException e) {
-			System.out.println("Fail sauce!");
+			e.printStackTrace();
+			System.out.println("Failed to get read JSON Object");
 		}
 
 		return info;

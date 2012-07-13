@@ -88,11 +88,17 @@ public class FlowManagerPusher {
 		// Return result string from key "status"
 		return json.getString("status");
 	}
+	
+	public static void removeAll(String dpid) throws IOException, JSONException {
+		URL url = new URL("http://" + IP
+				+ ":8080/wm/staticflowentrypusher/clear/" + dpid + "/json");
+		URLConnection conn = url.openConnection();
+		conn.setDoOutput(true);
+	}
 
 	public static Flow parseTableChanges(TableItem[] items) {
 
 		Flow flow = FlowManager.getFlow();
-
 		if (!items[0].getText(1).isEmpty())
 			flow.setName(items[0].getText(1));
 		if (!items[3].getText(1).isEmpty())

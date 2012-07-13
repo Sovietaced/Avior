@@ -67,7 +67,8 @@ public class Gui {
 				display.sleep();
 			}
 		}
-		shell.dispose();
+		// If the window is closed, stop the entire application.
+		display.dispose();
 	}
 
 	private void displaySwitchData() {

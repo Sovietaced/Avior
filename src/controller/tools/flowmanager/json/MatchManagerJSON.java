@@ -1,16 +1,8 @@
 package controller.tools.flowmanager.json;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
-import model.tools.flowmanager.Action;
 import model.tools.flowmanager.Match;
-
-import org.openflow.util.HexString;
 
 import view.Gui;
 

@@ -34,9 +34,7 @@ import org.eclipse.swt.widgets.Button;
 
 import avior.json.JSONException;
 
-import controller.tools.flowmanager.json.ActionManagerJSON;
 import controller.tools.flowmanager.json.FlowManagerJSON;
-import controller.tools.flowmanager.json.MatchManagerJSON;
 import controller.tools.flowmanager.push.FlowManagerPusher;
 import controller.tools.flowmanager.table.FlowToTable;
 
@@ -326,7 +324,7 @@ public class FlowManager {
 		Composite composite_2 = new Composite(composite, SWT.NONE);
 		composite_2.setBounds(10, 0, 194, 742);
 
-		tree_switches = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS);
+		tree_switches = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS | SWT.NONE);
 		tree_switches.setBounds(0, 33, 185, 268);
 		tree_switches.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -391,23 +389,33 @@ public class FlowManager {
 				System.out.println(flow.serialize());
 				try {
 					try {
-						FlowManager.setFlow(FlowManagerPusher
-								.parseTableChanges(table_flow.getItems()));
-						String response = FlowManagerPusher.push(flow);
-						if (response.equals("Entry pushed"))
-							populateFlowTree(tree_switches.getSelection()[0]
-									.getText());
+						if (flow.getName() != null) {
+							setFlow(FlowManagerPusher
+									.parseTableChanges(table_flow.getItems()));
+							String response = FlowManagerPusher.push(flow);
+							if (response.equals("Entry pushed"))
+								populateFlowTree(tree_switches.getSelection()[0]
+										.getText());
 
-						// Dispose the editor do it doesn't leave a ghost table
-						// item
-						if (editor.getEditor() != null)
-							editor.getEditor().dispose();
+							// Dispose the editor do it doesn't leave a ghost
+							// table
+							// item
+							if (editor.getEditor() != null)
+								editor.getEditor().dispose();
 
-						MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-								| SWT.OK);
-						mb.setText("Status");
-						mb.setMessage(response);
-						mb.open();
+							MessageBox mb = new MessageBox(shell,
+									SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Status");
+							mb.setMessage(response);
+							mb.open();
+						}
+						else{
+							MessageBox mb = new MessageBox(shell,
+									SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Error");
+							mb.setMessage("Your flow must have a name");
+							mb.open();
+						}
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -428,22 +436,52 @@ public class FlowManager {
 		btnDeleteFlow.setText("Delete Flow");
 		btnDeleteFlow.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					System.out.println(FlowManagerPusher.remove(flow));
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+					try {
+						try {
+							String response = FlowManagerPusher.remove(flow);
+							if (response.equals("Entry " + flow.getName() + " deleted"))
+								populateFlowTree(flow.getSwitch());
+
+							// Dispose the editor do it doesn't leave a ghost table
+							// item
+							if (editor.getEditor() != null)
+								editor.getEditor().dispose();
+
+							MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+									| SWT.OK);
+							mb.setText("Status");
+							mb.setMessage(response);
+							mb.open();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					} catch (JSONException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 			}
 		});
 
 		Button btnDeleteAllFlows = new Button(composite_3, SWT.NONE);
 		btnDeleteAllFlows.setBounds(643, 3, 125, 29);
 		btnDeleteAllFlows.setText("Delete All Flows");
-
+		btnDeleteAllFlows.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+					
+							try {
+								FlowManagerPusher.removeAll(getCurrSwitch());
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (JSONException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+			}
+		});
+		
 		populateSwitchTree();
 
 		shell.setLayout(gl_shell);
