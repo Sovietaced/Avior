@@ -60,17 +60,17 @@ public class Startup {
 			if (InetAddress.getByName(txtIp.getText()).isReachable(timeOut)) {
 				// try {
 				shell.setVisible(false);
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
+				//new Thread(new Runnable() {
+					//@Override
+					//public void run() {
+					//	Display.getDefault().asyncExec(new Runnable() {
+						//	@Override
+						//	public void run() {
 								new Gui(txtIp.getText());
-							}
-						});
-					}
-				}).start();
+						//	}
+						//});
+				//	}
+				//}).start();
 				// } catch (Exception swaggg) {
 				// swaggg.printStackTrace();
 				// MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR

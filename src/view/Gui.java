@@ -238,7 +238,7 @@ public class Gui {
 
 		Label lblM = new Label(composite_2, SWT.NONE);
 		lblM.setBounds(10, 10, 107, 17);
-		lblM.setText("Avior v1.0");
+		lblM.setText("Avior v1.1");
 
 		TreeItem trtmTest = new TreeItem(tree, SWT.NONE);
 		trtmTest.setText("Overview");

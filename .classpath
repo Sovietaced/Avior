@@ -11,8 +11,8 @@
 	<classpathentry kind="lib" path="lib/httpcore-4.2.jar"/>
 	<classpathentry kind="lib" path="lib/httpmime-4.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/swt-3.7.2-cocoa-macosx-x86_64.zip"/>
 	<classpathentry kind="lib" path="lib/swt-grouplayout.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swt.gtk.linux.x86_64_3.7.2.v3740f.jar"/>
+	<classpathentry kind="lib" path="lib/linux_swt.jar"/>
+	<classpathentry kind="lib" path="lib/osx_swt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
