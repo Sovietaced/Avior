@@ -65,7 +65,7 @@ public class About {
 
 		Label lblFloodlightOpenflowControl = new Label(shell, SWT.NONE);
 		lblFloodlightOpenflowControl
-				.setText("Avior | Floodlight Control Module");
+				.setText("Avior | Floodlight Network Management Application");
 		lblFloodlightOpenflowControl.setLayoutData(new GridData(SWT.CENTER,
 				SWT.CENTER, false, false, 1, 1));
 		new Label(shell, SWT.NONE);

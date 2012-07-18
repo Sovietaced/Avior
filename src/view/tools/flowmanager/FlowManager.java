@@ -348,7 +348,7 @@ public class FlowManager {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					TreeItem [] selection_switches = tree_switches.getSelection();
-					TreeItem [] selection_flows = tree_switches.getSelection();
+					TreeItem [] selection_flows = tree_flows.getSelection();
 					
 					if(selection_switches.length != 0 && selection_flows.length != 0){
 					flow = FlowManagerJSON.getFlow(
@@ -407,7 +407,7 @@ public class FlowManager {
 				System.out.println(flow.serialize());
 				try {
 					try {
-						if (flow.getName() != null) {
+						if (flow.getName() != null || !table_flow.getItems()[0].getText(1).isEmpty()) {
 							setFlow(FlowManagerPusher
 									.parseTableChanges(table_flow.getItems()));
 							String response = FlowManagerPusher.push(flow);
@@ -426,7 +426,7 @@ public class FlowManager {
 							mb.setText("Status");
 							mb.setMessage(response);
 							mb.open();
-						} else {
+						} else	{
 							MessageBox mb = new MessageBox(shell,
 									SWT.ICON_ERROR | SWT.OK);
 							mb.setText("Error");

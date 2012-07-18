@@ -64,7 +64,6 @@ public class FlowManagerJSON {
 		obj = Deserializer.readJsonObjectFromURL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/list/" + dpid + "/json");
 		obj = obj.getJSONObject(dpid).getJSONObject(flowName);
-
 		Flow flow = new Flow();
 		flow.setSwitch(dpid);
 		flow.setName(flowName);
@@ -80,7 +79,7 @@ public class FlowManagerJSON {
 		if (obj.getInt("outPort") != -1)
 			flow.setOutPort(String.valueOf(obj.getInt("outPort")));
 
-		System.out.println(flow.serialize());
+		System.out.println("Debugging flow.serialize()" + flow.serialize());
 
 		return flow;
 	}
