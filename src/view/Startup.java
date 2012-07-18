@@ -58,27 +58,19 @@ public class Startup {
 		int timeOut = 5000;
 		try {
 			if (InetAddress.getByName(txtIp.getText()).isReachable(timeOut)) {
-				// try {
-				shell.setVisible(false);
-				//new Thread(new Runnable() {
-					//@Override
-					//public void run() {
-					//	Display.getDefault().asyncExec(new Runnable() {
-						//	@Override
-						//	public void run() {
-								new Gui(txtIp.getText());
-						//	}
-						//});
-				//	}
-				//}).start();
-				// } catch (Exception swaggg) {
-				// swaggg.printStackTrace();
-				// MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-				// | SWT.OK);
-				// mb.setText("Tacos!");
-				// mb.setMessage("swaggggg.");
-				// mb.open();
-				// }
+//				try {
+					shell.setVisible(false);
+
+					new Gui(txtIp.getText());
+
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+//							| SWT.OK);
+//					mb.setText("Error : A-1");
+//					mb.setMessage("Something went horribly wrong.");
+//					mb.open();
+//				}
 			} else {
 				MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 				mb.setText("Error!");

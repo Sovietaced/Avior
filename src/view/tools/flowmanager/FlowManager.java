@@ -41,7 +41,7 @@ import controller.tools.flowmanager.table.FlowToTable;
 import view.About;
 
 public class FlowManager {
-
+ 
 	protected Shell shell;
 	protected Tree tree_switches, tree_flows;
 	protected Table table_flow;
@@ -338,16 +338,18 @@ public class FlowManager {
 			}
 		});
 
-		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS);
+		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.None);
 		tree_flows.setBounds(0, 330, 185, 412);
 		tree_flows.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					if(tree_flows.getSelection()[0].getText() != null){
 					flow = FlowManagerJSON.getFlow(
 							tree_switches.getSelection()[0].getText(),
 							tree_flows.getSelection()[0].getText());
 					populateFlowTable(flow);
+					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

@@ -191,47 +191,49 @@ public class Gui {
 		fd_composite_2.left = new FormAttachment(0, 10);
 		composite_2.setLayoutData(fd_composite_2);
 
-		final Tree tree = new Tree(composite_2, SWT.BORDER);
+		final Tree tree = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS | SWT.NONE);
 		tree.setBounds(0, 36, 127, 705);
 		tree.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				TreeItem[] selection = tree.getSelection();
+				TreeItem [] selection = tree.getSelection();
 				// Handler for Switches tree item
-				if (selection[0].getText(0).equals("Switches")) {
-					stackLayout.topControl = switches_table;
-					composite_1.layout();
-					displaySwitchData();
-				}
-
-				// Handler for Controller tree item
-				if (selection[0].getText(0).equals("Controller")) {
-					stackLayout.topControl = controllerOverview;
-					composite_1.layout();
-					try {
-						displayControllerInfo();
-					} catch (JSONException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				if(selection.length != 0){
+					if (selection[0].getText().equals("Switches")) {
+						stackLayout.topControl = switches_table;
+						composite_1.layout();
+						displaySwitchData();
 					}
-				}
 
-				// Handler for Devices tree item
-				if (selection[0].getText(0).equals("Devices")) {
-					stackLayout.topControl = devices_table;
-					composite_1.layout();
-					displayDevicesData();
-				}
+					// Handler for Controller tree item
+					if (selection[0].getText().equals("Controller")) {
+						stackLayout.topControl = controllerOverview;
+						composite_1.layout();
+						try {
+							displayControllerInfo();
+						} catch (JSONException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
 
-				// Handler for Flow Manager tree item
-				if (selection[0].getText(0).equals("Flow Manager")) {
-					new FlowManager();
-				}
+					// Handler for Devices tree item
+					if (selection[0].getText().equals("Devices")) {
+						stackLayout.topControl = devices_table;
+						composite_1.layout();
+						displayDevicesData();
+					}
 
-				// Handler for Firewall tree item
-				if (selection[0].getText(0).equals("Firewall ")) {
-					System.out.println("Swagtein!");
-					// new Firewall();
+					// Handler for Flow Manager tree item
+					if (selection[0].getText().equals("Flow Manager")) {
+						new FlowManager();
+					}
+
+					// Handler for Firewall tree item
+					if (selection[0].getText().equals("Firewall ")) {
+						System.out.println("Swagtein!");
+						// new Firewall();
+					}
 				}
 			}
 		});
