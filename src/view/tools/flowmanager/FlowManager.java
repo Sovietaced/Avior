@@ -334,7 +334,10 @@ public class FlowManager {
 		tree_switches.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				populateFlowTree(tree_switches.getSelection()[0].getText());
+				TreeItem [] selection_switches = tree_switches.getSelection();
+				if(selection_switches.length != 0){
+				populateFlowTree(selection_switches[0].getText());
+				}
 			}
 		});
 
@@ -344,10 +347,13 @@ public class FlowManager {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					if(tree_flows.getSelection()[0].getText() != null){
+					TreeItem [] selection_switches = tree_switches.getSelection();
+					TreeItem [] selection_flows = tree_switches.getSelection();
+					
+					if(selection_switches.length != 0 && selection_flows.length != 0){
 					flow = FlowManagerJSON.getFlow(
-							tree_switches.getSelection()[0].getText(),
-							tree_flows.getSelection()[0].getText());
+							selection_switches[0].getText(),
+							selection_flows[0].getText());
 					populateFlowTable(flow);
 					}
 				} catch (IOException e1) {

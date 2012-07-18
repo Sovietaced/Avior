@@ -231,7 +231,7 @@ public class Gui {
 
 					// Handler for Firewall tree item
 					if (selection[0].getText().equals("Firewall ")) {
-						System.out.println("Swagtein!");
+						System.out.println("Features not available yet!");
 						// new Firewall();
 					}
 				}
