@@ -19,6 +19,7 @@ Changelog
 =========
 
 v1.1 - Secondary release, application removed from the floodlight controller and built as a separate application.
+
 v1.0 - Initial release, application built into the floodlight controller as a module.
 
 About
