@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import controller.Deserializer;
+import controller.util.Deserializer;
+import controller.util.JSONArray;
+import controller.util.JSONException;
+import controller.util.JSONObject;
 
 import model.overview.SwitchSummary;
 
-import avior.json.JSONArray;
-import avior.json.JSONException;
-import avior.json.JSONObject;
 
 import view.Gui;
 
-public class Switches {
+public class SwitchesJSON {
 
 	static String IP = Gui.IP;
 	static JSONObject obj;

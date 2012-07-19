@@ -3,14 +3,14 @@ package controller.overview.json;
 import java.io.IOException;
 import java.util.Iterator;
 
-import controller.Deserializer;
+import controller.util.Deserializer;
+import controller.util.JSONException;
+import controller.util.JSONObject;
 
 import view.Gui;
 
-import avior.json.JSONException;
-import avior.json.JSONObject;
 
-public class Controller {
+public class ControllerJSON {
 
 	static String IP = Gui.IP;
 	static JSONObject obj;

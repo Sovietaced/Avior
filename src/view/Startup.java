@@ -58,19 +58,9 @@ public class Startup {
 		int timeOut = 5000;
 		try {
 			if (InetAddress.getByName(txtIp.getText()).isReachable(timeOut)) {
-//				try {
+					// Here we dispose this screen and launch the GUI
 					shell.setVisible(false);
-
 					new Gui(txtIp.getText());
-
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-//							| SWT.OK);
-//					mb.setText("Error : A-1");
-//					mb.setMessage("Something went horribly wrong.");
-//					mb.open();
-//				}
 			} else {
 				MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 				mb.setText("Error!");
@@ -131,13 +121,14 @@ public class Startup {
 
 		try {
 			ImageData ideaImage = new ImageData(getClass().getResourceAsStream(
-					"floodlight.png"));
+					"img/floodlight.png"));
 			Image floodlight = new Image(display, ideaImage);
 			Label lblNewLabel_2 = new Label(shell, SWT.NONE);
 			lblNewLabel_2.setBounds(50, 20, 250, 50);
 			lblNewLabel_2.setImage(floodlight);
 		} catch (Exception j) {
-			System.out.println("OSX Error");
+			System.out.println("Error Code I-1");
+			j.printStackTrace();
 		}
 
 		Label lblEnterTheIp = new Label(shell, SWT.NONE);
@@ -147,7 +138,7 @@ public class Startup {
 
 		txtIp = new Text(shell, SWT.BORDER);
 		txtIp.setBounds(63, 102, 120, 27);
-		// Add a listener for the text box, if enter is pressed we attempt to
+		// Listener for the text box, if enter is pressed we attempt to
 		// connect
 		txtIp.addTraverseListener(new TraverseListener() {
 			@Override

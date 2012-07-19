@@ -2,9 +2,10 @@ package controller.tools.flowmanager.table;
 
 import java.io.IOException;
 
+import controller.util.JSONException;
+
 import model.tools.flowmanager.Match;
 import view.tools.flowmanager.FlowManager;
-import avior.json.JSONException;
 
 public class MatchToTable {
 

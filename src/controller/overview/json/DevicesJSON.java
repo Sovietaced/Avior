@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import controller.Deserializer;
+import controller.util.Deserializer;
+import controller.util.JSONArray;
+import controller.util.JSONException;
+import controller.util.JSONObject;
 
 import model.overview.DeviceSummary;
-import avior.json.JSONArray;
-import avior.json.JSONException;
-import avior.json.JSONObject;
 
 import view.Gui;
 
-public class Devices {
+public class DevicesJSON {
 
 	static String IP = Gui.IP;
 	static JSONObject obj;

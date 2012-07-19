@@ -9,8 +9,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import org.eclipse.swt.widgets.TableItem;
 
-import avior.json.JSONException;
-import avior.json.JSONObject;
+import controller.util.JSONException;
+import controller.util.JSONObject;
+
 
 import model.tools.flowmanager.Flow;
 

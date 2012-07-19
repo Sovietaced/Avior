@@ -28,8 +28,8 @@ import org.eclipse.swt.custom.TableEditor;
 
 import controller.tools.flowmanager.push.MatchManagerPusher;
 import controller.tools.flowmanager.table.MatchToTable;
+import controller.util.JSONException;
 
-import avior.json.JSONException;
 
 public class MatchManager {
 

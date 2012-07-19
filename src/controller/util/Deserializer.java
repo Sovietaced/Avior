@@ -1,4 +1,4 @@
-package controller;
+package controller.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,9 +8,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import avior.json.JSONArray;
-import avior.json.JSONException;
-import avior.json.JSONObject;
 
 public class Deserializer {
 

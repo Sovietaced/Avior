@@ -32,11 +32,11 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Button;
 
-import avior.json.JSONException;
 
 import controller.tools.flowmanager.json.FlowManagerJSON;
 import controller.tools.flowmanager.push.FlowManagerPusher;
 import controller.tools.flowmanager.table.FlowToTable;
+import controller.util.JSONException;
 
 import view.About;
 
@@ -210,7 +210,7 @@ public class FlowManager {
 				MessageBox messageBox = new MessageBox(shell, style);
 				messageBox.setText("Are you sure?!");
 				messageBox
-						.setMessage("Are you sure you wish to exit the flow manager? Any unsaved changed will not be pushed.");
+						.setMessage("Are you sure you wish to exit the flow manager? Any unsaved changes will not be pushed.");
 				event.doit = messageBox.open() == SWT.YES;
 			}
 		});

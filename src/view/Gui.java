@@ -1,6 +1,5 @@
 package view;
 
-import avior.json.JSONException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -25,9 +24,10 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 
 import view.tools.flowmanager.FlowManager;
 
-import controller.overview.json.Controller;
-import controller.overview.json.Devices;
-import controller.overview.json.Switches;
+import controller.overview.json.ControllerJSON;
+import controller.overview.json.DevicesJSON;
+import controller.overview.json.SwitchesJSON;
+import controller.util.JSONException;
 
 public class Gui {
 
@@ -68,7 +68,7 @@ public class Gui {
 		switches_table.removeAll();
 
 		try {
-			String[][] switchSummariesTable = Switches.switchSummariesToTable();
+			String[][] switchSummariesTable = SwitchesJSON.switchSummariesToTable();
 			for (String[] data : switchSummariesTable) {
 				new TableItem(switches_table, SWT.NONE).setText(data);
 			}
@@ -83,7 +83,7 @@ public class Gui {
 	}
 
 	private void displayControllerInfo() throws JSONException {
-		String[] controllerInfo = Controller.getControllerInfo();
+		String[] controllerInfo = ControllerJSON.getControllerInfo();
 		if (controllerInfo != null) {
 			lblInsertHostname.setText(controllerInfo[0]);
 			lblInsertHealthy.setText(controllerInfo[1]);
@@ -101,7 +101,7 @@ public class Gui {
 	private void displayDevicesData() {
 		// Clears the table prior to populating it with data
 		devices_table.removeAll();
-		String[][] devicesSummaryTable = Devices.deviceSummariesToTable();
+		String[][] devicesSummaryTable = DevicesJSON.deviceSummariesToTable();
 		if (devicesSummaryTable != null) {
 			for (String[] data : devicesSummaryTable) {
 				new TableItem(devices_table, SWT.NONE).setText(data);
@@ -231,7 +231,7 @@ public class Gui {
 
 					// Handler for Firewall tree item
 					if (selection[0].getText().equals("Firewall ")) {
-						System.out.println("Features not available yet!");
+						System.out.println("Feature not available yet!");
 						// new Firewall();
 					}
 				}

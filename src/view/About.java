@@ -65,7 +65,7 @@ public class About {
 
 		Label lblFloodlightOpenflowControl = new Label(shell, SWT.NONE);
 		lblFloodlightOpenflowControl
-				.setText("Avior | Floodlight Network Management Application");
+				.setText("Avior is a Floodlight Network Management Application");
 		lblFloodlightOpenflowControl.setLayoutData(new GridData(SWT.CENTER,
 				SWT.CENTER, false, false, 1, 1));
 		new Label(shell, SWT.NONE);
@@ -132,14 +132,14 @@ public class About {
 
 		try {
 			ImageData ideaImage = new ImageData(getClass().getResourceAsStream(
-					"marist.gif"));
+					"img/marist.gif"));
 			Image marist = new Image(display, ideaImage);
 			Label lblNewLabel_2 = new Label(shell, SWT.NONE);
 			lblNewLabel_2.setImage(marist);
 			lblNewLabel_2.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
 					false, false, 1, 1));
 		} catch (Exception j) {
-			System.out.println("OSX Error");
+			System.out.println("Failed to display image");
 		}
 
 	}
