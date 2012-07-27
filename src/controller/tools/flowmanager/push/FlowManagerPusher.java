@@ -95,7 +95,7 @@ public class FlowManagerPusher {
 		if (!items[0].getText(1).isEmpty())
 			flow.setName(items[0].getText(1));
 		if (!items[3].getText(1).isEmpty())
-			flow.setPriority(items[0].getText(1));
+			flow.setPriority(items[3].getText(1));
 		if (!items[4].getText(1).isEmpty())
 			flow.setCookie(items[4].getText(1));
 		if (!items[5].getText(1).isEmpty())

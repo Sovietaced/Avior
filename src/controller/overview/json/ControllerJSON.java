@@ -1,7 +1,9 @@
 package controller.overview.json;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import controller.util.Deserializer;
 import controller.util.JSONException;
@@ -15,42 +17,40 @@ public class ControllerJSON {
 	static String IP = Gui.IP;
 	static JSONObject obj;
 
-	public static String[] getControllerInfo() throws JSONException {
+	public static List<String> getControllerInfo() throws JSONException {
 
-		String[] info = new String[4];
+		List <String> info = new ArrayList<String>();
 
 		// Add the ip address of the controller
-		info[0] = (IP);
+		info.add(0,IP);
 
 		// Get whether the controller is healthy or not
 		try {
 			obj = Deserializer.readJsonObjectFromURL("http://" + IP
 					+ ":8080/wm/core/health/json");
 			if (obj.getBoolean("healthy")) {
-				info[1] = "Yes";
+				info.add(1,"Yes");
 			} else {
-				info[1] = "No";
+				info.add(1,"No");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Failed to get read JSON Object");
 		}
 
-		// Get the packets/bytes/flows information for each switch and add it to
-		// the summary
+		// Get the JVM memory bloat
 		try {
 			obj = Deserializer.readJsonObjectFromURL("http://" + IP
 					+ ":8080/wm/core/memory/json");
 			long free = obj.getLong("free");
 			long total = obj.getLong("total");
-			info[2] = (formatLong(free) + " free of " + formatLong(total));
+			info.add(2,formatLong(free) + " free of " + formatLong(total));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Failed to get read JSON Object");
 		}
 
-		// Get the packets/bytes/flows information for each switch and add it to
-		// the summary
+		// Get the modules loaded for the controller
 		try {
 			obj = Deserializer.readJsonObjectFromURL("http://" + IP
 					+ ":8080/wm/core/module/loaded/json");
@@ -66,7 +66,7 @@ public class ControllerJSON {
 					System.out.println("swag sack");
 				}
 			}
-			info[3] = modules;
+			info.add(modules);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Failed to get read JSON Object");

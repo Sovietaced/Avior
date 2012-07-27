@@ -2,6 +2,7 @@ package controller.overview.json;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import controller.util.Deserializer;
@@ -9,8 +10,9 @@ import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
-import model.overview.SwitchSummary;
-
+import model.overview.Port;
+import model.overview.Switch;
+import model.tools.flowmanager.Flow;
 
 import view.Gui;
 
@@ -19,81 +21,217 @@ public class SwitchesJSON {
 	static String IP = Gui.IP;
 	static JSONObject obj;
 
-	public static List<SwitchSummary> getSwitchSummaries() throws JSONException {
+	public static List<Switch> getSwitches() throws JSONException {
 
-		List<SwitchSummary> switchSummaries = new ArrayList<SwitchSummary>();
+		List<String> switchDpids = new ArrayList<String>();
+		List<Switch> switches = new ArrayList<Switch>();
+		List<Port> ports = new ArrayList<Port>();
 
-		// Get the string IDs of all the switches and create switch summary
-		// objects for each one
 		try {
 			JSONArray json = Deserializer.readJsonArrayFromURL("http://" + IP
 					+ ":8080/wm/core/controller/switches/json");
 			for (int i = 0; i < json.length(); i++) {
 				obj = json.getJSONObject(i);
-				switchSummaries.add(new SwitchSummary(obj.getString("dpid")));
+				switchDpids.add(obj.getString("dpid"));
 			}
 		} catch (IOException e) {
-			System.out.println("Fail sauce!");
-		}
-
-		// Get the vendor information for each switch and add it to the summary
-		try {
-			for (SwitchSummary sum : switchSummaries) {
-				obj = Deserializer.readJsonObjectFromURL("http://" + IP
-						+ ":8080/wm/core/switch/" + sum.getDpid()
-						+ "/desc/json");
-				JSONObject desc = obj.getJSONArray(sum.getDpid())
-						.getJSONObject(0);
-				sum.setVendor(desc.getString("manufacturerDescription"));
-			}
-		} catch (IOException e) {
-			System.out.println("Fail sauce!");
-		}
-
-		// Get the packets/bytes/flows information for each switch and add it to
-		// the summary
-		try {
-			for (SwitchSummary sum : switchSummaries) {
-				obj = Deserializer.readJsonObjectFromURL("http://" + IP
-						+ ":8080/wm/core/switch/" + sum.getDpid()
-						+ "/aggregate/json");
-				JSONObject aggr = obj.getJSONArray(sum.getDpid())
-						.getJSONObject(0);
-				sum.setPacketCount(aggr.getInt("packetCount"));
-				sum.setByteCount(aggr.getInt("byteCount"));
-				sum.setFlowCount(aggr.getInt("flowCount"));
-			}
-		} catch (IOException e) {
-			System.out.println("Fail sauce!");
-		}
-
-		return switchSummaries;
-	}
-
-	public static String[][] switchSummariesToTable() {
-
-		List<SwitchSummary> summaries = null;
-		try {
-			summaries = getSwitchSummaries();
-		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		String[][] tableArr = new String[summaries.size()][6];
-		int count = 0;
+		for (String dpid : switchDpids) {
+			// Create the new switch object
+			// Automatically grabs flows
+			Switch sw = new Switch(dpid);
+			ports = new ArrayList<Port>();
 
-		for (SwitchSummary sum : summaries) {
-			List<String> stringList = new ArrayList<String>();
-			stringList.add(String.valueOf(count + 1));
-			stringList.add(sum.getDpid());
-			stringList.add(sum.getManufacturer());
-			stringList.add(String.valueOf(sum.getPacketCount()));
-			stringList.add(String.valueOf(sum.getByteCount()));
-			stringList.add(String.valueOf(sum.getFlowCount()));
+			// Get the vendor information for each switch and add it to the
+			// summary
+			try {
+				obj = Deserializer
+						.readJsonObjectFromURL("http://" + IP
+								+ ":8080/wm/core/switch/" + sw.getDpid()
+								+ "/desc/json");
+				obj = obj.getJSONArray(sw.getDpid()).getJSONObject(0);
+				sw.setManufacturerDescription(obj
+						.getString("manufacturerDescription"));
+				sw.setHardwareDescription(obj.getString("hardwareDescription"));
+				sw.setSoftwareDescription(obj.getString("softwareDescription"));
+				sw.setSerialNumber(obj.getString("serialNumber"));
+				sw.setDatapathDescription(obj.getString("datapathDescription"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-			tableArr[count] = stringList.toArray(new String[stringList.size()]);
-			count++;
+			// Get the packets/bytes/flows information for each switch and add
+			// it to
+			// the summary
+			try {
+				obj = Deserializer.readJsonObjectFromURL("http://" + IP
+						+ ":8080/wm/core/switch/" + sw.getDpid()
+						+ "/aggregate/json");
+				obj = obj.getJSONArray(sw.getDpid()).getJSONObject(0);
+				sw.setPacketCount(String.valueOf(obj.getInt("packetCount")));
+				sw.setByteCount(String.valueOf(obj.getInt("byteCount")));
+				sw.setFlowCount(String.valueOf(obj.getInt("flowCount")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// Get the port information for each switch and add it to the
+			// summary
+			try {
+				obj = Deserializer
+						.readJsonObjectFromURL("http://" + IP
+								+ ":8080/wm/core/switch/" + sw.getDpid()
+								+ "/port/json");
+				
+				JSONObject objtwo = Deserializer
+						.readJsonObjectFromURL("http://" + IP
+								+ ":8080/wm/core/switch/" + sw.getDpid()
+								+ "/features/json");
+				
+				JSONArray json = obj.getJSONArray(sw.getDpid());
+				objtwo = objtwo.getJSONObject(sw.getDpid());
+				JSONArray jsontwo = objtwo.getJSONArray("ports");
+				
+				for(int i = 0; i < json.length(); i++){
+					// Here we get json info using the port option
+					
+					obj = (JSONObject) json.get(i);
+					Port port = new Port(String.valueOf(obj.getInt("portNumber")));
+					port.setReceivePackets(String.valueOf(obj.getLong("receivePackets")));
+					port.setTransmitPackets(String.valueOf(obj.getLong("transmitPackets")));
+					port.setReceiveBytes(String.valueOf(obj.getLong("receiveBytes")));
+					port.setTransmitBytes(String.valueOf(obj.getLong("transmitBytes")));
+					port.setReceiveDropped(String.valueOf(obj.getLong("receiveDropped")));
+					port.setTransmitDropped(String.valueOf(obj.getLong("transmitDropped")));
+					port.setReceiveErrors(String.valueOf(obj.getLong("receiveErrors")));
+					port.setTransmitErrors(String.valueOf(obj.getLong("transmitErrors")));
+					port.setReceieveFrameErrors(String.valueOf(obj.getInt("receiveFrameErrors")));
+					port.setReceieveOverrunErrors(String.valueOf(obj.getInt("receiveOverrunErrors")));
+					port.setReceiveCRCErrors(String.valueOf(obj.getInt("receiveCRCErrors")));
+					port.setCollisions(String.valueOf(obj.getInt("collisions")));
+					// Here we get json info using the features option
+					if(!jsontwo.isNull(i)){
+					obj = (JSONObject) jsontwo.get(i);
+						port.setAdvertisedFeatures(String.valueOf(obj.getInt("advertisedFeatures")));
+						port.setConfig(String.valueOf(obj.getInt("config")));
+						port.setCurrentFeatures(String.valueOf(obj.getInt("currentFeatures")));
+						port.setHardwareAddress(obj.getString("hardwareAddress"));
+						port.setName(obj.getString("name"));
+						port.setPeerFeatures(String.valueOf(obj.getInt("peerFeatures")));
+						port.setState(String.valueOf(obj.getInt("state")));
+						port.setSupportedFeatures(String.valueOf(obj.getInt("supportedFeatures")));
+					}
+						// Add the port to the list...
+						ports.add(port);
+						}
+				// Add the ports to the switch
+				sw.setPorts(ports);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	
+			// Add the switch full of information to the list
+			switches.add(sw);
 		}
-		return tableArr;
+		return switches;
+		}
+	
+	public static Switch getSwitch(String Dpid) throws JSONException {
+
+		Switch sw = new Switch(Dpid);
+		List<Port> ports = new ArrayList<Port>();
+
+			// Get the vendor information for each switch and add it to the
+			// summary
+			try {
+				obj = Deserializer
+						.readJsonObjectFromURL("http://" + IP
+								+ ":8080/wm/core/switch/" + sw.getDpid()
+								+ "/desc/json");
+				obj = obj.getJSONArray(sw.getDpid()).getJSONObject(0);
+				sw.setManufacturerDescription(obj
+						.getString("manufacturerDescription"));
+				sw.setHardwareDescription(obj.getString("hardwareDescription"));
+				sw.setSoftwareDescription(obj.getString("softwareDescription"));
+				sw.setSerialNumber(obj.getString("serialNumber"));
+				sw.setDatapathDescription(obj.getString("datapathDescription"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// Get the packets/bytes/flows information for each switch and add
+			// it to
+			// the summary
+			try {
+				obj = Deserializer.readJsonObjectFromURL("http://" + IP
+						+ ":8080/wm/core/switch/" + sw.getDpid()
+						+ "/aggregate/json");
+				obj = obj.getJSONArray(sw.getDpid()).getJSONObject(0);
+				sw.setPacketCount(String.valueOf(obj.getInt("packetCount")));
+				sw.setByteCount(String.valueOf(obj.getInt("byteCount")));
+				sw.setFlowCount(String.valueOf(obj.getInt("flowCount")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// Get the port information for each switch and add it to the
+			// summary
+			try {
+				obj = Deserializer
+						.readJsonObjectFromURL("http://" + IP
+								+ ":8080/wm/core/switch/" + sw.getDpid()
+								+ "/port/json");
+				
+				JSONObject objtwo = Deserializer
+						.readJsonObjectFromURL("http://" + IP
+								+ ":8080/wm/core/switch/" + sw.getDpid()
+								+ "/features/json");
+				
+				JSONArray json = obj.getJSONArray(sw.getDpid());
+				objtwo = objtwo.getJSONObject(sw.getDpid());
+				JSONArray jsontwo = objtwo.getJSONArray("ports");
+				
+				for(int i = 0; i < json.length(); i++){
+					// Here we get json info using the port option
+					
+					obj = (JSONObject) json.get(i);
+					Port port = new Port(String.valueOf(obj.getInt("portNumber")));
+					port.setReceivePackets(String.valueOf(obj.getLong("receivePackets")));
+					port.setTransmitPackets(String.valueOf(obj.getLong("transmitPackets")));
+					port.setReceiveBytes(String.valueOf(obj.getLong("receiveBytes")));
+					port.setTransmitBytes(String.valueOf(obj.getLong("transmitBytes")));
+					port.setReceiveDropped(String.valueOf(obj.getLong("receiveDropped")));
+					port.setTransmitDropped(String.valueOf(obj.getLong("transmitDropped")));
+					port.setReceiveErrors(String.valueOf(obj.getLong("receiveErrors")));
+					port.setTransmitErrors(String.valueOf(obj.getLong("transmitErrors")));
+					port.setReceieveFrameErrors(String.valueOf(obj.getInt("receiveFrameErrors")));
+					port.setReceieveOverrunErrors(String.valueOf(obj.getInt("receiveOverrunErrors")));
+					port.setReceiveCRCErrors(String.valueOf(obj.getInt("receiveCRCErrors")));
+					port.setCollisions(String.valueOf(obj.getInt("collisions")));
+					// Here we get json info using the features option
+					if(!jsontwo.isNull(i)){
+					obj = (JSONObject) jsontwo.get(i);
+						port.setAdvertisedFeatures(String.valueOf(obj.getInt("advertisedFeatures")));
+						port.setConfig(String.valueOf(obj.getInt("config")));
+						port.setCurrentFeatures(String.valueOf(obj.getInt("currentFeatures")));
+						port.setHardwareAddress(obj.getString("hardwareAddress"));
+						port.setName(obj.getString("name"));
+						port.setPeerFeatures(String.valueOf(obj.getInt("peerFeatures")));
+						port.setState(String.valueOf(obj.getInt("state")));
+						port.setSupportedFeatures(String.valueOf(obj.getInt("supportedFeatures")));
+					}
+						// Add the port to the list...
+						ports.add(port);
+						}
+				// Add the ports to the switch
+				sw.setPorts(ports);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		return sw;
+		}
+	
 	}
-}

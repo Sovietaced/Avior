@@ -1,8 +1,10 @@
 package view.tools.flowmanager;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import model.overview.Switch;
 import model.tools.flowmanager.Action;
 import model.tools.flowmanager.Flow;
 import model.tools.flowmanager.Match;
@@ -32,16 +34,16 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Button;
 
-
 import controller.tools.flowmanager.json.FlowManagerJSON;
 import controller.tools.flowmanager.push.FlowManagerPusher;
 import controller.tools.flowmanager.table.FlowToTable;
 import controller.util.JSONException;
 
 import view.About;
+import view.Gui;
 
 public class FlowManager {
- 
+
 	protected Shell shell;
 	protected Tree tree_switches, tree_flows;
 	protected Table table_flow;
@@ -52,6 +54,8 @@ public class FlowManager {
 	protected static Match match;
 	protected String serializedMatch;
 	protected static Flow flow;
+	protected List<Switch> switches = new ArrayList<Switch>();
+	protected List<Flow> flows = new ArrayList<Flow>();
 
 	/**
 	 * Launch the application.
@@ -124,41 +128,30 @@ public class FlowManager {
 		tree_flows.removeAll();
 		tree_switches.removeAll();
 
-		List<String> switches = null;
-		try {
-			switches = FlowManagerJSON.getSwitchList();
-		} catch (JSONException e) {
-			System.out.println("Unable to parse switches from JSON");
-		} catch (IOException e) {
-			System.out.println("Unable to get switches from JSON");
-		}
+		switches = Gui.getSwitches();
 
-		if (switches != null) {
-			for (String sw : switches) {
-				new TreeItem(tree_switches, SWT.NONE).setText(sw);
+		if (!switches.isEmpty()) {
+			for (Switch sw : switches) {
+				new TreeItem(tree_switches, SWT.NONE).setText(sw.getDpid());
 			}
 		}
 	}
 
-	private void populateFlowTree(String dpid) {
+	private void populateFlowTree(int index) {
 
-		List<String> flows = null;
-		setCurrSwitch(dpid);
 		tree_flows.removeAll();
 		table_flow.removeAll();
-
-		try {
-			flows = FlowManagerJSON.getFlowList(dpid);
-		} catch (JSONException e) {
-			System.out.println("No flows exist for  this switch!");
-		} catch (IOException e) {
-			System.out.println("Unable to get flows from JSON");
-		}
-
-		if (flows != null) {
-			for (String flow : flows) {
-				new TreeItem(tree_flows, SWT.NONE).setText(flow);
+		System.out.println(index);
+		Switch sw = switches.get(index);
+		currSwitch = sw.getDpid();
+		flows = sw.getFlows();
+		
+		if (!flows.isEmpty()) {
+			for (Flow flow : flows) {
+				new TreeItem(tree_flows, SWT.NONE).setText(flow.getName());
 			}
+		} else {
+			new TreeItem(tree_flows, SWT.NONE).setText("No Static Flows Set");
 		}
 	}
 
@@ -166,6 +159,7 @@ public class FlowManager {
 
 		currFlow = f.getName();
 		table_flow.removeAll();
+		flow = f;
 
 		String[][] flowTable = null;
 		flowTable = FlowToTable.getFlowTableFormat(f);
@@ -334,9 +328,9 @@ public class FlowManager {
 		tree_switches.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				TreeItem [] selection_switches = tree_switches.getSelection();
-				if(selection_switches.length != 0){
-				populateFlowTree(selection_switches[0].getText());
+				TreeItem[] selection_switches = tree_switches.getSelection();
+				if (selection_switches.length != 0) {
+					populateFlowTree(tree_switches.indexOf(selection_switches[0]));
 				}
 			}
 		});
@@ -346,22 +340,20 @@ public class FlowManager {
 		tree_flows.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					TreeItem [] selection_switches = tree_switches.getSelection();
-					TreeItem [] selection_flows = tree_flows.getSelection();
-					
-					if(selection_switches.length != 0 && selection_flows.length != 0){
-					flow = FlowManagerJSON.getFlow(
-							selection_switches[0].getText(),
-							selection_flows[0].getText());
-					populateFlowTable(flow);
+				TreeItem[] selection_switches = tree_switches.getSelection();
+				TreeItem[] selection_flows = tree_flows.getSelection();
+
+				if (selection_switches.length != 0
+						&& selection_flows.length != 0) {
+					if (!selection_flows[0].getText().equals(
+							"No Static Flows Set")) {
+						for (Flow flow : flows) {
+							if (flow.getName().equals(
+									selection_flows[0].getText())) {
+								populateFlowTable(flow);
+							}
+						}
 					}
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 			}
 		});
@@ -407,13 +399,15 @@ public class FlowManager {
 				System.out.println(flow.serialize());
 				try {
 					try {
-						if (flow.getName() != null || !table_flow.getItems()[0].getText(1).isEmpty()) {
+						if (flow.getName() != null
+								|| !table_flow.getItems()[0].getText(1)
+										.isEmpty()) {
 							setFlow(FlowManagerPusher
 									.parseTableChanges(table_flow.getItems()));
 							String response = FlowManagerPusher.push(flow);
 							if (response.equals("Entry pushed"))
 								populateFlowTree(tree_switches.getSelection()[0]
-										.getText());
+										.getItemCount());
 
 							// Dispose the editor do it doesn't leave a ghost
 							// table
@@ -426,7 +420,7 @@ public class FlowManager {
 							mb.setText("Status");
 							mb.setMessage(response);
 							mb.open();
-						} else	{
+						} else {
 							MessageBox mb = new MessageBox(shell,
 									SWT.ICON_ERROR | SWT.OK);
 							mb.setText("Error");
@@ -458,8 +452,9 @@ public class FlowManager {
 					try {
 						String response = FlowManagerPusher.remove(flow);
 						if (response.equals("Entry " + flow.getName()
-								+ " deleted"))
-							populateFlowTree(flow.getSwitch());
+								+ " deleted")){
+							populateFlowTree(tree_switches.getSelection()[0].getItemCount());
+						}
 
 						// Dispose the editor do it doesn't leave a ghost table
 						// item

@@ -6,17 +6,13 @@ import java.util.List;
 public class Flow {
 
 	String name, priority, cookie, idleTimeOut, hardTimeOut, outPort, sw;
-	List<Action> actions;
-	Match match;
+	List<Action> actions = new ArrayList<Action>();
+	Match match = new Match();
 
 	public Flow() {
-		actions = new ArrayList<Action>();
-		match = new Match();
 	}
 
 	public Flow(String selectedSwitch) {
-		actions = new ArrayList<Action>();
-		match = new Match();
 		sw = selectedSwitch;
 	}
 
