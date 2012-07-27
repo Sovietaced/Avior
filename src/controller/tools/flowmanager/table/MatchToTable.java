@@ -5,7 +5,7 @@ import java.io.IOException;
 import controller.util.JSONException;
 
 import model.tools.flowmanager.Match;
-import view.tools.flowmanager.FlowManager;
+import view.tools.flowmanager.StaticFlowManager;
 
 public class MatchToTable {
 
@@ -13,7 +13,7 @@ public class MatchToTable {
 	public static String[][] getMatchTableFormat() throws JSONException,
 			IOException {
 
-		Match m = FlowManager.getMatch();
+		Match m = StaticFlowManager.getMatch();
 		String[][] match = {
 				{ "Data Layer Destination", m.getDataLayerDestination() },
 				{ "Data Layer Source", m.getDataLayerSource() },

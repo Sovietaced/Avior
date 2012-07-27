@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import controller.util.Deserializer;
+import controller.util.FormatLong;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
@@ -44,7 +45,7 @@ public class ControllerJSON {
 					+ ":8080/wm/core/memory/json");
 			long free = obj.getLong("free");
 			long total = obj.getLong("total");
-			info.add(2,formatLong(free) + " free of " + formatLong(total));
+			info.add(2,FormatLong.format(free) + " free of " + FormatLong.format(total));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Failed to get read JSON Object");
@@ -73,19 +74,5 @@ public class ControllerJSON {
 		}
 
 		return info;
-	}
-
-	/* Formats longs for proper representation in the paint */
-	public static String formatLong(long paramLong) {
-		if (paramLong >= 1000000000L) {
-			return paramLong / 1000000000L + "GB";
-		}
-		if (paramLong >= 10000000L) {
-			return paramLong / 1000000L + "MB";
-		}
-		if (paramLong >= 1000L) {
-			return paramLong / 1000L + "KB";
-		}
-		return "" + paramLong;
 	}
 }

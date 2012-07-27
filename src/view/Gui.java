@@ -27,11 +27,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 
-import view.tools.flowmanager.FlowManager;
+import view.tools.flowmanager.StaticFlowManager;
 
 import controller.overview.json.ControllerJSON;
 import controller.overview.json.DevicesJSON;
-import controller.overview.json.SwitchesJSON;
+import controller.overview.switches.json.SwitchesJSON;
+import controller.overview.table.FlowToTable;
 import controller.overview.table.PortToTable;
 import controller.overview.table.SwitchToTable;
 import controller.util.JSONException;
@@ -40,7 +41,7 @@ public class Gui {
 
 	protected Shell shell;
 	protected Table switches_table;
-	protected Table devices_table, table_ports;
+	protected Table devices_table, table_ports, table_flows;
 	protected Composite controllerOverview, detailed_switch;
 	protected Label lblInsertHostname, lblInsertHealthy, lblInsertJvmMemory,
 			lblInsertModules, lblSn, lblHardware, lblSoftware, lblManufacturer;
@@ -156,9 +157,13 @@ public class Gui {
 		}
 	}
 
+	// This gets all the information switches on the network
 	private void updateSwitchesData() {
+		// Since we are updating the data, clear the table
 		switches_table.removeAll();
+		// No single switch is selected so set the current switch to null
 		currSwitch = null;
+		// Attempt to get the switches via JSON
 		try {
 			switches = SwitchesJSON.getSwitches();
 		} catch (JSONException e) {
@@ -167,10 +172,16 @@ public class Gui {
 		}
 	}
 
+	// This loads the switches tab with the DPIDs of all the switches
+	//TODO make a single function to only get the DPIDS so it's faster!
 	private void loadSwitchesTree() {
+		// No single switch is selected to set the current switch to null
 		currSwitch = null;
+		// Get the most recent information about the switches
 		updateSwitchesData();
+		// Clear the tree before we populate it with fresh information
 		trtmSwitches.removeAll();
+		// If there are switches and the tree is not disposed, populate it
 		if (!switches.isEmpty() && trtmSwitches != null) {
 			for (Switch sw : switches) {
 				TreeItem tempSwitch = new TreeItem(trtmSwitches, SWT.NONE);
@@ -179,8 +190,11 @@ public class Gui {
 		}
 	}
 
+	// This gets information about all the switches. 
 	private void loadSwitchesData() {
+		// Get the most recent data about the switches
 		updateSwitchesData();
+		// Get the table represenation of those switches
 		String[][] switchTable = SwitchToTable.getSwitchTableFormat(switches);
 		if (switchTable != null) {
 			for (String[] data : switchTable) {
@@ -190,10 +204,16 @@ public class Gui {
 		shell.setText("Overview for all switches");
 	}
 
+	// This specifically loads information about a switch's ports. This allows for a faster response in the GUI
 	private void loadSwitchData(Switch sw) {
-
+		// Clear the tables of any old information
+		table_ports.removeAll();
+		// Clear the tables of any old information
+		table_flows.removeAll();
+		// Set the current switch the to switch selected
 		currSwitch = sw;
 
+		// Try to get the up to date information about this switch
 		try {
 			sw = SwitchesJSON.getSwitch(sw.getDpid());
 		} catch (JSONException e) {
@@ -201,8 +221,14 @@ public class Gui {
 			e.printStackTrace();
 		}
 
-		table_ports.removeAll();
 		// FLOWS TO TABLE
+		String[][] flowTable = FlowToTable.getFlowTableFormat(sw.getFlows());
+		if (flowTable != null) {
+			for (String[] data : flowTable) {
+				new TableItem(table_flows, SWT.NONE).setText(data);
+			}
+		}
+		
 		String[][] portTable = PortToTable.getPortTableFormat(sw.getPorts());
 		if (portTable != null) {
 			for (String[] data : portTable) {
@@ -326,7 +352,7 @@ public class Gui {
 
 					// Handler for Flow Manager tree item
 					else if (selection[0].getText().equals("Flow Manager")) {
-						new FlowManager();
+						new StaticFlowManager();
 					}
 
 					// Handler for Firewall tree item
@@ -508,11 +534,44 @@ public class Gui {
 		tblclmnerrors.setWidth(100);
 		tblclmnerrors.setText("Errors");
 
-		Table table_flows = new Table(detailed_switch, SWT.BORDER
+		table_flows = new Table(detailed_switch, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		table_flows.setBounds(10, 412, 947, 288);
 		table_flows.setHeaderVisible(true);
 		table_flows.setLinesVisible(true);
+		
+		TableColumn flownum = new TableColumn(table_flows, SWT.NONE);
+		flownum.setWidth(30);
+		flownum.setText("#");
+		
+		TableColumn flowpriority = new TableColumn(table_flows, SWT.NONE);
+		flowpriority.setWidth(65);
+		flowpriority.setText("Priority");
+		
+		TableColumn flowmatch = new TableColumn(table_flows, SWT.NONE);
+		flowmatch.setWidth(425);
+		flowmatch.setText("Match");
+		
+		TableColumn flowaction = new TableColumn(table_flows, SWT.NONE);
+		flowaction.setWidth(100);
+		flowaction.setText("Action");
+		
+		TableColumn flowpackets = new TableColumn(table_flows, SWT.NONE);
+		flowpackets.setWidth(75);
+		flowpackets.setText("Packets");
+		
+		TableColumn flowbytes = new TableColumn(table_flows, SWT.NONE);
+		flowbytes.setWidth(75);
+		flowbytes.setText("Bytes");
+		
+		TableColumn flowage = new TableColumn(table_flows, SWT.NONE);
+		flowage.setWidth(75);
+		flowage.setText("Age");
+		
+		TableColumn flowtime = new TableColumn(table_flows, SWT.NONE);
+		flowtime.setWidth(75);
+		flowtime.setText("Timeout");
+		
 		fd_composite_2.left = new FormAttachment(0, 10);
 		fd_composite_2.top = new FormAttachment(0);
 		fd_composite_2.bottom = new FormAttachment(0, 742);

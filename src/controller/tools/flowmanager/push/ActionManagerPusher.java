@@ -6,7 +6,7 @@ import model.tools.flowmanager.Action;
 
 import org.eclipse.swt.widgets.TableItem;
 
-import view.tools.flowmanager.FlowManager;
+import view.tools.flowmanager.StaticFlowManager;
 
 public class ActionManagerPusher {
 
@@ -29,7 +29,7 @@ public class ActionManagerPusher {
 
 	public static List<Action> addNewAction(TableItem[] items, String actionType) {
 
-		List<Action> actions = FlowManager.getActions();
+		List<Action> actions = StaticFlowManager.getActions();
 
 		if (actionType.equals("enqueue")) {
 			actions.add(new Action(items[2].getText(1), (items[0].getText(1)
@@ -44,13 +44,13 @@ public class ActionManagerPusher {
 	}
 
 	public static List<Action> removeAction(int index) {
-		List<Action> actions = FlowManager.getActions();
+		List<Action> actions = StaticFlowManager.getActions();
 		actions.remove(index);
 		return actions;
 	}
 
 	public static List<Action> removeAllActions() {
-		List<Action> actions = FlowManager.getActions();
+		List<Action> actions = StaticFlowManager.getActions();
 		actions.clear();
 		return actions;
 	}

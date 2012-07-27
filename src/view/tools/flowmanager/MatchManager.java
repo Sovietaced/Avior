@@ -109,8 +109,8 @@ public class MatchManager {
 		shell = new Shell();
 		shell.setSize(400, 600);
 		shell.setText("Match Information for Switch : "
-				+ FlowManager.getFlow().getSwitch() + " Flow : "
-				+ FlowManager.getFlow().getName());
+				+ StaticFlowManager.getFlow().getSwitch() + " Flow : "
+				+ StaticFlowManager.getFlow().getName());
 		shell.setLayout(new GridLayout(1, false));
 
 		Menu menu = new Menu(shell, SWT.BAR);
@@ -177,7 +177,7 @@ public class MatchManager {
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FlowManager.setMatch(MatchManagerPusher.addMatch(table_match
+				StaticFlowManager.setMatch(MatchManagerPusher.addMatch(table_match
 						.getItems()));
 				// Dispose the editor do it doesn't leave a ghost table item
 				if (editor.getEditor() != null) {

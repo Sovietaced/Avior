@@ -82,7 +82,7 @@ public class ActionManager {
 		table_action.removeAll();
 		tree.removeAll();
 
-		actions = FlowManager.getActions();
+		actions = StaticFlowManager.getActions();
 
 		if (actions != null) {
 			for (Action action : actions) {
@@ -135,13 +135,13 @@ public class ActionManager {
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(800, 350);
-		if (FlowManager.getFlow() != null)
+		if (StaticFlowManager.getFlow() != null)
 			shell.setText("Action Information for Switch : "
-					+ FlowManager.getFlow().getSwitch() + " Flow : "
-					+ FlowManager.getFlow().getName());
+					+ StaticFlowManager.getFlow().getSwitch() + " Flow : "
+					+ StaticFlowManager.getFlow().getName());
 		else
 			shell.setText("Action Information for Switch : "
-					+ FlowManager.getCurrSwitch() + " New Flow");
+					+ StaticFlowManager.getCurrSwitch() + " New Flow");
 		shell.setLayout(new GridLayout(2, false));
 
 		Menu menu = new Menu(shell, SWT.BAR);
@@ -250,7 +250,7 @@ public class ActionManager {
 				} else if (currAction == null && newAction == true) {
 					// Failsafe for if the table item is empty
 					if (!table_action.getItems()[0].getText(1).isEmpty()) {
-						FlowManager.setActions(ActionManagerPusher
+						StaticFlowManager.setActions(ActionManagerPusher
 								.addNewAction(table_action.getItems(),
 										actionType));
 						// Dispose the editor do it doesn't leave a ghost table
@@ -271,7 +271,7 @@ public class ActionManager {
 				// Save existing flow changes
 				else if (currAction != null) {
 					if (!table_action.getItems()[0].getText(1).isEmpty()) {
-						FlowManager.setActions(ActionManagerPusher.addAction(
+						StaticFlowManager.setActions(ActionManagerPusher.addAction(
 								table_action.getItems(), actionType,
 								currActionIndex));
 
@@ -301,7 +301,7 @@ public class ActionManager {
 			public void widgetSelected(SelectionEvent e) {
 				// Remove the action
 				if (newAction == false) {
-					FlowManager.setActions(ActionManagerPusher
+					StaticFlowManager.setActions(ActionManagerPusher
 							.removeAction(currActionIndex));
 					populateActionTree();
 				} else {

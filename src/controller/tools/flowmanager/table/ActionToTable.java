@@ -3,14 +3,14 @@ package controller.tools.flowmanager.table;
 import java.util.List;
 
 import model.tools.flowmanager.Action;
-import view.tools.flowmanager.FlowManager;
+import view.tools.flowmanager.StaticFlowManager;
 
 public class ActionToTable {
 
 	// Gets an action by it's index and formats it so that it can be displayed
 	// in a table
 	public static String[][] getActionTableFormat(int index) {
-		List<Action> actions = FlowManager.getActions();
+		List<Action> actions = StaticFlowManager.getActions();
 		Action action = actions.get(index);
 
 		if (action.getType().equals("strip-vlan")) {

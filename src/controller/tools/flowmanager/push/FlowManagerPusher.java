@@ -16,7 +16,7 @@ import controller.util.JSONObject;
 import model.tools.flowmanager.Flow;
 
 import view.Gui;
-import view.tools.flowmanager.FlowManager;
+import view.tools.flowmanager.StaticFlowManager;
 
 public class FlowManagerPusher {
 
@@ -91,7 +91,7 @@ public class FlowManagerPusher {
 
 	public static Flow parseTableChanges(TableItem[] items) {
 
-		Flow flow = FlowManager.getFlow();
+		Flow flow = StaticFlowManager.getFlow();
 		if (!items[0].getText(1).isEmpty())
 			flow.setName(items[0].getText(1));
 		if (!items[3].getText(1).isEmpty())

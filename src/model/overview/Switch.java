@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import controller.tools.flowmanager.json.FlowManagerJSON;
+import controller.tools.flowmanager.json.StaticFlowManagerJSON;
 import controller.util.JSONException;
 
 import model.tools.flowmanager.Flow;
@@ -17,15 +17,6 @@ public class Switch {
 	
 	public Switch(String dpid){
 		this.dpid = dpid;
-		try {
-			this.flows = FlowManagerJSON.getFlows(this.dpid);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public String getPacketCount() {

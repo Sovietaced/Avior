@@ -179,8 +179,83 @@ public class Match {
 			serial = serial.concat(",\"src-port\":\"" + this.transportSource
 					+ "\"");
 		}
-		if (this.wildcards != null) {
-			serial = serial.concat(",\"wildcards\":\"" + this.wildcards + "\"");
+		//if (this.wildcards != null) {
+		//	serial = serial.concat(",\"wildcards\":\"" + this.wildcards + "\"");
+		// This is not able to be set by the user yet
+		// if(!this.networkDestinationMaskLength.isEmpty())
+		// if(serial.length() > 5)
+		// serial = serial.concat(",");
+		// serial = serial.concat("\"ingress-port\":\"" +
+		// this.networkDestinationMaskLength + "\"");
+		// This is not able to be set by the user yet
+		// if(!this.networkSourceMaskLength.isEmpty())
+		// if(serial.length() > 5)
+		// serial = serial.concat(",");
+		// serial = serial.concat("\"ingress-port\":\"" +
+		// this.networkSourceMaskLength + "\"");
+		return serial;
+	}
+	
+	public String toString() {
+		String serial = "";
+		if (this.dataLayerSource != null) {
+			if(serial.length() > 5)
+			serial = serial.concat(", ");
+			serial = serial.concat("src-mac:" + this.dataLayerSource);
+		}
+		if (this.dataLayerDestination != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("dst-mac:"
+					+ this.dataLayerDestination);
+		}
+		if (this.dataLayerType != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("ether-type:" + this.dataLayerType);
+		}
+		if (this.dataLayerVLAN != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("vlan-id:" + this.dataLayerVLAN);
+		}
+		if (this.dataLayerPCP != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("vlan-priority:" + this.dataLayerPCP);
+		}
+		if (this.inputPort != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("port:" + this.inputPort);
+		}
+		if (this.networkDestination != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("dst-ip:" + this.networkDestination);
+		}
+		if (this.networkSource != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial
+					.concat("src-ip:" + this.networkSource);
+		}
+		if (this.networkTypeOfService != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("tos-bits:"
+					+ this.networkTypeOfService);
+		}
+		if (this.transportDestination != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("dst-port:"
+					+ this.transportDestination);
+		}
+		if (this.transportSource != null) {
+			if(serial.length() > 5)
+				serial = serial.concat(", ");
+			serial = serial.concat("src-port:" + this.transportSource);
 		}
 		// This is not able to be set by the user yet
 		// if(!this.networkDestinationMaskLength.isEmpty())
