@@ -8,7 +8,6 @@ import java.util.List;
 import model.tools.flowmanager.Flow;
 
 import view.Gui;
-import view.tools.flowmanager.StaticFlowManager;
 import controller.util.Deserializer;
 import controller.util.JSONArray;
 import controller.util.JSONException;

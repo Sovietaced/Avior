@@ -45,15 +45,16 @@ import view.Gui;
 public class StaticFlowManager {
 
 	protected Shell shell;
-	protected Tree tree_switches, tree_flows;
+	public Tree tree_switches;
+	public Tree tree_flows;
 	protected Table table_flow;
 	protected TableEditor editor;
 	final int EDITABLECOLUMN = 1;
-	protected static String currFlow, currSwitch;
-	protected static List<Action> actions;
-	protected static Match match;
+	public static String currFlow, currSwitch;
+	public static List<Action> actions;
+	public static Match match;
 	protected String serializedMatch;
-	protected static Flow flow;
+	public static Flow flow;
 	protected List<Switch> switches = new ArrayList<Switch>();
 	protected List<Flow> flows = new ArrayList<Flow>();
 
@@ -66,10 +67,11 @@ public class StaticFlowManager {
 	public StaticFlowManager() {
 		open();
 	}
-
-	/**
-	 * Open the window.
-	 */
+	
+	public StaticFlowManager(int index) {
+		open(index);
+	}
+	
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
@@ -81,7 +83,21 @@ public class StaticFlowManager {
 			}
 		}
 	}
-
+	
+	// This is a second open method for pre-selecting a switch
+	public void open(int index) {
+		Display display = Display.getDefault();
+		createContents();
+		populateFlowTree(index);
+		shell.open();
+		shell.layout();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+	}
+	
 	public static Flow getFlow() {
 		return flow;
 	}
@@ -141,20 +157,31 @@ public class StaticFlowManager {
 
 		tree_flows.removeAll();
 		table_flow.removeAll();
-		System.out.println(index);
 		Switch sw = switches.get(index);
 		currSwitch = sw.getDpid();
-		flows = sw.getFlows();
-		
+		// This just makes sure the selection is noted in the event of pre-selection
+		tree_switches.select(tree_switches.getItem(index));
+		try {
+			// Here we get the static flows only
+			flows = StaticFlowManagerJSON.getFlows(currSwitch);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		if (!flows.isEmpty()) {
 			for (Flow flow : flows) {
-				new TreeItem(tree_flows, SWT.NONE).setText(flow.getName());
+				if (flow.getName() != null)
+					new TreeItem(tree_flows, SWT.NONE).setText(flow.getName());
 			}
 		} else {
 			new TreeItem(tree_flows, SWT.NONE).setText("No Static Flows Set");
 		}
 	}
-
+	
 	private void populateFlowTable(Flow f) {
 
 		currFlow = f.getName();
@@ -330,12 +357,13 @@ public class StaticFlowManager {
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem[] selection_switches = tree_switches.getSelection();
 				if (selection_switches.length != 0) {
-					populateFlowTree(tree_switches.indexOf(selection_switches[0]));
+					populateFlowTree(tree_switches
+							.indexOf(selection_switches[0]));
 				}
 			}
 		});
 
-		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.None);
+		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS | SWT.NONE);
 		tree_flows.setBounds(0, 330, 185, 412);
 		tree_flows.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -448,31 +476,41 @@ public class StaticFlowManager {
 		btnDeleteFlow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
+				if (flow != null) {
 					try {
-						String response = FlowManagerPusher.remove(flow);
-						if (response.equals("Entry " + flow.getName()
-								+ " deleted")){
-							populateFlowTree(tree_switches.getSelection()[0].getItemCount());
+						try {
+							String response = FlowManagerPusher.remove(flow);
+							if (response.equals("Entry " + flow.getName()
+									+ " deleted")) {
+								populateFlowTree(tree_switches.getSelection()[0]
+										.getItemCount());
+							}
+
+							// Dispose the editor do it doesn't leave a ghost
+							// table
+							// item
+							if (editor.getEditor() != null)
+								editor.getEditor().dispose();
+
+							MessageBox mb = new MessageBox(shell,
+									SWT.ICON_ERROR | SWT.OK);
+							mb.setText("Status");
+							mb.setMessage(response);
+							mb.open();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						}
-
-						// Dispose the editor do it doesn't leave a ghost table
-						// item
-						if (editor.getEditor() != null)
-							editor.getEditor().dispose();
-
-						MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-								| SWT.OK);
-						mb.setText("Status");
-						mb.setMessage(response);
-						mb.open();
-					} catch (IOException e1) {
+					} catch (JSONException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} else {
+					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+							| SWT.OK);
+					mb.setText("Error");
+					mb.setMessage("You must select a flow to delete!");
+					mb.open();
 				}
 			}
 		});
@@ -498,7 +536,6 @@ public class StaticFlowManager {
 		});
 
 		populateSwitchTree();
-
-		shell.setLayout(gl_shell);
+		shell.setLayout(gl_shell);	
 	}
 }

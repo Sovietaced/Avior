@@ -1,7 +1,10 @@
 package view;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.UnknownHostException;
 
 import org.eclipse.swt.widgets.Button;
@@ -143,7 +146,8 @@ public class Startup {
 		txtIp.addTraverseListener(new TraverseListener() {
 			@Override
 			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_RETURN) {
+				//TODO insert empty warning
+				if (e.detail == SWT.TRAVERSE_RETURN && !txtIp.getText().isEmpty()) {
 					connect();
 				}
 			}
@@ -159,6 +163,7 @@ public class Startup {
 		btnLaunch.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				if(!txtIp.getText().isEmpty())
 				connect();
 			}
 		});

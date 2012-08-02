@@ -2,7 +2,6 @@ package controller.overview.switches.json;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import controller.util.Deserializer;
@@ -24,6 +23,7 @@ public class SwitchesJSON {
 
 	public static List<Switch> getSwitches() throws JSONException {
 
+		// Create empty lists for all our data
 		List<String> switchDpids = new ArrayList<String>();
 		List<Switch> switches = new ArrayList<Switch>();
 		List<Port> ports = new ArrayList<Port>();
@@ -49,6 +49,7 @@ public class SwitchesJSON {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			
 			ports = new ArrayList<Port>();
 
 			// Get the vendor information for each switch and add it to the
@@ -212,10 +213,10 @@ public class SwitchesJSON {
 					
 					obj = (JSONObject) json.get(i);
 					Port port = new Port(String.valueOf(obj.getInt("portNumber")));
-					port.setReceivePackets(String.valueOf(obj.getLong("receivePackets")));
-					port.setTransmitPackets(String.valueOf(obj.getLong("transmitPackets")));
-					port.setReceiveBytes(FormatLong.format(obj.getLong("receiveBytes")));
-					port.setTransmitBytes(FormatLong.format(obj.getLong("transmitBytes")));
+					port.setReceivePackets(FormatLong.formatPackets(obj.getLong("receivePackets"), false,false));
+					port.setTransmitPackets(FormatLong.formatPackets(obj.getLong("transmitPackets"), false, false));
+					port.setReceiveBytes(FormatLong.formatBytes(obj.getLong("receiveBytes"), true, false));
+					port.setTransmitBytes(FormatLong.formatBytes(obj.getLong("transmitBytes"), true,false));
 					port.setReceiveDropped(String.valueOf(obj.getLong("receiveDropped")));
 					port.setTransmitDropped(String.valueOf(obj.getLong("transmitDropped")));
 					port.setReceiveErrors(String.valueOf(obj.getLong("receiveErrors")));

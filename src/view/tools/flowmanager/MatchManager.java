@@ -243,8 +243,6 @@ public class MatchManager {
 		TableColumn tblclmnValue = new TableColumn(table_match, SWT.NONE);
 		tblclmnValue.setWidth(100);
 		tblclmnValue.setText("Value");
-		GridData gd_label = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1,
-				2);
 
 		populateMatchTable();
 	}

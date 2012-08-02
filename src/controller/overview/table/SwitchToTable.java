@@ -3,7 +3,6 @@ package controller.overview.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.overview.Port;
 import model.overview.Switch;
 
 public class SwitchToTable {

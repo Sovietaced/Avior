@@ -5,8 +5,9 @@ import java.util.List;
 
 public class Flow {
 
-	String name, priority, cookie, idleTimeOut, hardTimeOut, outPort, sw, durationSeconds, packetCount, byteCount;
-	
+	String name, priority, cookie, idleTimeOut, hardTimeOut, outPort, sw,
+			durationSeconds, packetCount, byteCount;
+
 	public String getPacketCount() {
 		return packetCount;
 	}
@@ -112,19 +113,19 @@ public class Flow {
 	public void setMatch(Match match) {
 		this.match = match;
 	}
-	
-	public String actionsToString(){
+
+	public String actionsToString() {
 		String serial = "";
-			if (!actions.isEmpty()) {
-				int len = serial.length();
-				for (Action act : actions) {
-					if (serial.length() > len + 1)
-						serial = serial.concat(", ");
-					serial = serial.concat(act.serialize());
-				}
-				return serial;
-		}
+		if (!actions.isEmpty()) {
+			int len = serial.length();
+			for (Action act : actions) {
+				if (serial.length() > len + 1)
+					serial = serial.concat(", ");
+				serial = serial.concat(act.serialize());
+			}
 			return serial;
+		}
+		return serial;
 	}
 
 	public String serialize() {

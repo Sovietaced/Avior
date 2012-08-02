@@ -45,7 +45,7 @@ public class ControllerJSON {
 					+ ":8080/wm/core/memory/json");
 			long free = obj.getLong("free");
 			long total = obj.getLong("total");
-			info.add(2,FormatLong.format(free) + " free of " + FormatLong.format(total));
+			info.add(2,FormatLong.formatBytes(free,true,false) + " free of " + FormatLong.formatBytes(total,true,false));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Failed to get read JSON Object");

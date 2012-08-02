@@ -4,9 +4,6 @@ import java.io.IOException;
 
 import model.tools.flowmanager.Match;
 
-import view.Gui;
-
-import controller.util.Deserializer;
 import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;

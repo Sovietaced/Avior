@@ -41,13 +41,13 @@ public class ActionManager {
 	protected Combo combo;
 	protected Composite composite_3;
 	protected String flowName, switchID;
-	protected static int currActionIndex;
-	protected static String currAction, actionType;
+	protected int currActionIndex;
+	protected String currAction, actionType;
 	protected boolean newAction = false;
 	protected String[][] actionsSummary, actionTableFormat;
 	final int EDITABLECOLUMN = 1;
-	protected static TableEditor editor;
-	protected static Tree tree;
+	protected TableEditor editor;
+	protected Tree tree;
 	protected List<Action> actions;
 
 	public ActionManager() {
@@ -322,12 +322,13 @@ public class ActionManager {
 		tree.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// Dispose the editor do it doesn't leave a ghost table item
+
 				if (editor.getEditor() != null) {
 					editor.getEditor().dispose();
 				}
-
+				
 				populateActionTable(tree.indexOf(tree.getSelection()[0]));
+				
 			}
 		});
 
@@ -389,8 +390,6 @@ public class ActionManager {
 		TableColumn tblclmnValue = new TableColumn(table_action, SWT.NONE);
 		tblclmnValue.setWidth(100);
 		tblclmnValue.setText("Value");
-		GridData gd_label = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1,
-				2);
 
 		populateActionTree();
 	}

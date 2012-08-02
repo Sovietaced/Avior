@@ -3,16 +3,18 @@ package view;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.overview.DeviceSummary;
 import model.overview.Switch;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -28,6 +30,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 
 import view.tools.flowmanager.StaticFlowManager;
+import view.tools.patchpanel.PatchPanel;
 
 import controller.overview.json.ControllerJSON;
 import controller.overview.json.DevicesJSON;
@@ -40,8 +43,8 @@ import controller.util.JSONException;
 public class Gui {
 
 	protected Shell shell;
-	protected Table switches_table;
-	protected Table devices_table, table_ports, table_flows;
+	protected Table devices_table, table_ports, table_flows, table,
+			switches_table;
 	protected Composite controllerOverview, detailed_switch;
 	protected Label lblInsertHostname, lblInsertHealthy, lblInsertJvmMemory,
 			lblInsertModules, lblSn, lblHardware, lblSoftware, lblManufacturer;
@@ -51,7 +54,6 @@ public class Gui {
 	protected Display display;
 	public static String IP;
 	static List<Switch> switches = new ArrayList<Switch>();
-	List<DeviceSummary> devices = new ArrayList<DeviceSummary>();
 
 	/**
 	 * Launch the application.
@@ -140,23 +142,6 @@ public class Gui {
 		}
 	}
 
-	private void updateDevicesDisplay() {
-		trtmDevices.removeAll();
-		try {
-			devices = DevicesJSON.getDeviceSummaries();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (!devices.isEmpty()) {
-			for (DeviceSummary device : devices) {
-				new TreeItem(trtmDevices, SWT.NONE).setText(device
-						.getMacAddress());
-			}
-		}
-	}
-
 	// This gets all the information switches on the network
 	private void updateSwitchesData() {
 		// Since we are updating the data, clear the table
@@ -173,7 +158,7 @@ public class Gui {
 	}
 
 	// This loads the switches tab with the DPIDs of all the switches
-	//TODO make a single function to only get the DPIDS so it's faster!
+	// TODO make a single function to only get the DPIDS so it's faster!
 	private void loadSwitchesTree() {
 		// No single switch is selected to set the current switch to null
 		currSwitch = null;
@@ -190,7 +175,7 @@ public class Gui {
 		}
 	}
 
-	// This gets information about all the switches. 
+	// This gets information about all the switches.
 	private void loadSwitchesData() {
 		// Get the most recent data about the switches
 		updateSwitchesData();
@@ -204,7 +189,8 @@ public class Gui {
 		shell.setText("Overview for all switches");
 	}
 
-	// This specifically loads information about a switch's ports. This allows for a faster response in the GUI
+	// This specifically loads information about a switch's ports. This allows
+	// for a faster response in the GUI
 	private void loadSwitchData(Switch sw) {
 		// Clear the tables of any old information
 		table_ports.removeAll();
@@ -228,7 +214,7 @@ public class Gui {
 				new TableItem(table_flows, SWT.NONE).setText(data);
 			}
 		}
-		
+
 		String[][] portTable = PortToTable.getPortTableFormat(sw.getPorts());
 		if (portTable != null) {
 			for (String[] data : portTable) {
@@ -354,6 +340,11 @@ public class Gui {
 					else if (selection[0].getText().equals("Flow Manager")) {
 						new StaticFlowManager();
 					}
+					
+					// Handler for Flow Manager tree item
+					else if (selection[0].getText().equals("Patch Panel")) {
+						new PatchPanel();
+					}
 
 					// Handler for Firewall tree item
 					else if (selection[0].getText().equals("Firewall")) {
@@ -395,13 +386,36 @@ public class Gui {
 
 		TreeItem trtmFlowManager = new TreeItem(trtmTools, SWT.NONE);
 		trtmFlowManager.setText("Flow Manager");
+		
+		TreeItem trtmPatchPanel = new TreeItem(trtmTools, SWT.NONE);
+		trtmPatchPanel.setText("Patch Panel");
 
-		TreeItem trtmFirewall = new TreeItem(trtmTools, SWT.NONE);
-		trtmFirewall.setText("Firewall");
+		// TreeItem trtmFirewall = new TreeItem(trtmTools, SWT.NONE);
+		// trtmFirewall.setText("Firewall");
 
 		switches_table = new Table(composite_1, SWT.BORDER | SWT.FULL_SELECTION);
 		switches_table.setHeaderVisible(true);
 		switches_table.setLinesVisible(true);
+		final Menu switchMenu = new Menu(switches_table);
+	      switches_table.setMenu(switchMenu);
+	      switchMenu.addMenuListener(new MenuAdapter() {
+	         public void menuShown(MenuEvent e) {
+	            // Get rid of existing menu items
+	            MenuItem[] items = switchMenu.getItems();
+	            for (int i = 0; i < items.length; i++) {
+	               ((MenuItem) items[i]).dispose();
+	            }
+	            // Add menu items for current selection
+	            MenuItem newItem = new MenuItem(switchMenu, SWT.NONE);
+	            newItem.setText("Manage Flows");
+	            newItem.addSelectionListener(new SelectionAdapter(){
+	            	public void widgetSelected(SelectionEvent e){
+	            		new StaticFlowManager(switches_table.indexOf(switches_table.getSelection()[0]));
+	            	}
+	            });
+	         }
+	      });
+
 
 		TableColumn tableColumn_1 = new TableColumn(switches_table, SWT.NONE);
 		tableColumn_1.setWidth(50);
@@ -539,39 +553,39 @@ public class Gui {
 		table_flows.setBounds(10, 412, 947, 288);
 		table_flows.setHeaderVisible(true);
 		table_flows.setLinesVisible(true);
-		
+
 		TableColumn flownum = new TableColumn(table_flows, SWT.NONE);
 		flownum.setWidth(30);
 		flownum.setText("#");
-		
+
 		TableColumn flowpriority = new TableColumn(table_flows, SWT.NONE);
 		flowpriority.setWidth(65);
 		flowpriority.setText("Priority");
-		
+
 		TableColumn flowmatch = new TableColumn(table_flows, SWT.NONE);
 		flowmatch.setWidth(425);
 		flowmatch.setText("Match");
-		
+
 		TableColumn flowaction = new TableColumn(table_flows, SWT.NONE);
 		flowaction.setWidth(100);
 		flowaction.setText("Action");
-		
+
 		TableColumn flowpackets = new TableColumn(table_flows, SWT.NONE);
 		flowpackets.setWidth(75);
 		flowpackets.setText("Packets");
-		
+
 		TableColumn flowbytes = new TableColumn(table_flows, SWT.NONE);
 		flowbytes.setWidth(75);
 		flowbytes.setText("Bytes");
-		
+
 		TableColumn flowage = new TableColumn(table_flows, SWT.NONE);
 		flowage.setWidth(75);
 		flowage.setText("Age");
-		
+
 		TableColumn flowtime = new TableColumn(table_flows, SWT.NONE);
 		flowtime.setWidth(75);
 		flowtime.setText("Timeout");
-		
+
 		fd_composite_2.left = new FormAttachment(0, 10);
 		fd_composite_2.top = new FormAttachment(0);
 		fd_composite_2.bottom = new FormAttachment(0, 742);
@@ -602,9 +616,21 @@ public class Gui {
 		lblPorts.setText("Ports");
 		fd_composite_2.bottom = new FormAttachment(0, 710);
 		composite_2.setLayoutData(fd_composite_2);
+		
+		Button btnManageFlows = new Button(detailed_switch, SWT.NONE);
+		btnManageFlows.setBounds(837, 80, 110, 29);
+		btnManageFlows.setText("Manage Flows");
+		btnManageFlows.addSelectionListener(new SelectionAdapter(){
+		public void widgetSelected(SelectionEvent e){
+			new StaticFlowManager(switches.indexOf(currSwitch));
+
+		}
+	});
 
 		loadSwitchesTree();
-		updateDevicesDisplay();
+		// No need for this yet, restAPI doesn't serve much useful information
+		// about hosts
+		// updateDevicesDisplay();
 
 		stackLayout.topControl = controllerOverview;
 		composite_1.layout(true);

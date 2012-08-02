@@ -19,6 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 
+import controller.util.OpenURL;
+
 public class About {
 
 	protected Shell shell;
@@ -96,14 +98,7 @@ public class About {
 		project.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				try {
-					Desktop.getDesktop().browse(
-							new URI("http://openflow.marist.edu/"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (URISyntaxException ee) {
-					ee.printStackTrace();
-				}
+				OpenURL.open("http://openflow.marist.edu/");
 			}
 		});
 		project.setText("Project Homepage");
@@ -115,14 +110,7 @@ public class About {
 		source.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				try {
-					Desktop.getDesktop().browse(
-							new URI("https://github.com/Sovietaced/Avior"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (URISyntaxException ee) {
-					ee.printStackTrace();
-				}
+				OpenURL.open("https://github.com/Sovietaced/Avior");
 			}
 		});
 		source.setText("Project Source");
