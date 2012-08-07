@@ -2,6 +2,7 @@ package controller.tools.flowmanager.push;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -9,6 +10,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import org.eclipse.swt.widgets.TableItem;
 
+import controller.util.Deserializer;
+import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
@@ -82,15 +85,16 @@ public class FlowManagerPusher {
 		return json.getString("status");
 	}
 
-	public static void removeAll(String dpid) throws IOException, JSONException {
-		URL url = new URL("http://" + IP
-				+ ":8080/wm/staticflowentrypusher/clear/" + dpid + "/json");
+	public static void deleteAll(String dpid) throws IOException, JSONException {
+		// This makes a simple get request that will delete all flows from a switch
+		String urlString = "http://" + IP
+				+ ":8080/wm/staticflowentrypusher/clear/" + dpid + "/json";
+		URL url = new URL(urlString);
 		URLConnection conn = url.openConnection();
-		conn.setDoOutput(true);
+		InputStream is = conn.getInputStream();
 	}
 
 	public static Flow parseTableChanges(TableItem[] items) {
-
 		Flow flow = StaticFlowManager.getFlow();
 		if (!items[0].getText(1).isEmpty())
 			flow.setName(items[0].getText(1));

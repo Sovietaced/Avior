@@ -85,7 +85,7 @@ public class Startup {
 
 	private void createContents() {
 		shell = new Shell();
-		shell.setSize(450, 300);
+		shell.setSize(500, 400);
 		shell.setText("Avior Launch");
 		shell.setLayout(null);
 
@@ -127,7 +127,7 @@ public class Startup {
 					"img/floodlight.png"));
 			Image floodlight = new Image(display, ideaImage);
 			Label lblNewLabel_2 = new Label(shell, SWT.NONE);
-			lblNewLabel_2.setBounds(50, 20, 250, 50);
+			lblNewLabel_2.setBounds(0, 0, 470, 278);
 			lblNewLabel_2.setImage(floodlight);
 		} catch (Exception j) {
 			System.out.println("Error Code I-1");
@@ -135,12 +135,12 @@ public class Startup {
 		}
 
 		Label lblEnterTheIp = new Label(shell, SWT.NONE);
-		lblEnterTheIp.setBounds(37, 79, 344, 17);
+		lblEnterTheIp.setBounds(37, 279, 344, 17);
 		lblEnterTheIp
 				.setText("Enter the IP address of the controller to begin");
 
 		txtIp = new Text(shell, SWT.BORDER);
-		txtIp.setBounds(63, 102, 120, 27);
+		txtIp.setBounds(63, 302, 120, 27);
 		// Listener for the text box, if enter is pressed we attempt to
 		// connect
 		txtIp.addTraverseListener(new TraverseListener() {
@@ -154,11 +154,11 @@ public class Startup {
 		});
 
 		Label lblIp = new Label(shell, SWT.NONE);
-		lblIp.setBounds(40, 108, 17, 27);
+		lblIp.setBounds(40, 308, 17, 27);
 		lblIp.setText("IP:");
 
 		Button btnLaunch = new Button(shell, SWT.NONE);
-		btnLaunch.setBounds(206, 102, 91, 29);
+		btnLaunch.setBounds(206, 302, 91, 29);
 		btnLaunch.setText("Launch");
 		btnLaunch.addSelectionListener(new SelectionAdapter() {
 			@Override

@@ -67,7 +67,8 @@ public class MatchManagerJSON {
 		if (obj.getInt("transportSource") != 0)
 			match.setTransportSource(String.valueOf(obj
 					.getInt("transportSource")));
-		match.setWildcards(String.valueOf(obj.getLong("wildcards")));
+		if(obj.getLong("wildcards") != 4194303)
+			match.setWildcards(String.valueOf(obj.getLong("wildcards")));
 
 		return match;
 	}

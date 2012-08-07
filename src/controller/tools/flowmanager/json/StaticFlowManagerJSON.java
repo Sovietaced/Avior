@@ -16,7 +16,7 @@ import controller.util.JSONObject;
 public class StaticFlowManagerJSON {
 
 	static String IP = Gui.IP;
-	static JSONObject obj;
+	static JSONObject jsonobj, obj;
 	static JSONArray json;
 
 	public static List<Flow> getFlows(String sw) throws IOException,
@@ -25,18 +25,20 @@ public class StaticFlowManagerJSON {
 		List<Flow> flows = new ArrayList<Flow>();
 		
 		// Get the string names of all the specified switch's flows
-		obj = Deserializer.readJsonObjectFromURL("http://" + IP
+		jsonobj = Deserializer.readJsonObjectFromURL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/list/" + sw + "/json");
 		
-		if (!obj.isNull(sw)){
-			obj = obj.getJSONObject(sw);
-			Iterator<?> myIter = obj.keys();
+		if (!jsonobj.isNull(sw)){
+			jsonobj = jsonobj.getJSONObject(sw);
+			// Get the keys for the JSON Object
+			Iterator<?> myIter = jsonobj.keys();
+			// If a key exists, get the JSON Object for that key and create a flow using that object
 			while (myIter.hasNext()) {
 				try {
 					String key = (String) myIter.next();
-					if(obj.has(key)){
-					if (obj.get(key) instanceof JSONObject) {
-						obj = (JSONObject) obj.get(key);
+					if(jsonobj.has(key)){
+					if (jsonobj.get(key) instanceof JSONObject) {
+						obj = (JSONObject) jsonobj.get(key);
 						Flow flow = new Flow();
 						flow.setSwitch(sw);
 						flow.setName(key);
@@ -55,7 +57,6 @@ public class StaticFlowManagerJSON {
 						if (obj.getInt("outPort") != -1)
 							flow.setOutPort(String.valueOf(obj
 									.getInt("outPort")));
-						System.out.println(flow.serialize());
 						flows.add(flow);
 						}
 					}

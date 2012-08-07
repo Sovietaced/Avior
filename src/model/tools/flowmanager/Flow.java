@@ -8,6 +8,13 @@ public class Flow {
 	String name, priority, cookie, idleTimeOut, hardTimeOut, outPort, sw,
 			durationSeconds, packetCount, byteCount;
 
+	public Flow() {
+	}
+
+	public Flow(String selectedSwitch) {
+		sw = selectedSwitch;
+	}
+	
 	public String getPacketCount() {
 		return packetCount;
 	}
@@ -34,13 +41,6 @@ public class Flow {
 
 	List<Action> actions = new ArrayList<Action>();
 	Match match = new Match();
-
-	public Flow() {
-	}
-
-	public Flow(String selectedSwitch) {
-		sw = selectedSwitch;
-	}
 
 	public String getSwitch() {
 		return sw;
@@ -134,43 +134,43 @@ public class Flow {
 		if (sw != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"switch\": \"" + sw + "\"");
+			serial = serial.concat("\"switch\":\"" + sw + "\"");
 		}
 		if (name != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"name\": \"" + name + "\"");
+			serial = serial.concat("\"name\":\"" + name + "\"");
 		}
 		serial = serial.concat(", \"active\":\"true\"");
 		if (cookie != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"cookie\": \"" + cookie + "\"");
+			serial = serial.concat("\"cookie\":\"" + cookie + "\"");
 		}
 		if (priority != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"priority\": \"" + priority + "\"");
+			serial = serial.concat("\"priority\":\"" + priority + "\"");
 		}
 		if (idleTimeOut != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"idleTimout\": \"" + idleTimeOut + "\"");
+			serial = serial.concat("\"idleTimout\":\"" + idleTimeOut + "\"");
 		}
 		if (hardTimeOut != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"hardTimeout\": \"" + hardTimeOut + "\"");
+			serial = serial.concat("\"hardTimeout\":\"" + hardTimeOut + "\"");
 		}
 		if (outPort != null) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"outPort\": \"" + outPort + "\"");
+			serial = serial.concat("\"outPort\":\"" + outPort + "\"");
 		}
 		if (!actions.isEmpty()) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
-			serial = serial.concat("\"actions\": \"");
+			serial = serial.concat("\"actions\":\"");
 			int len = serial.length();
 			for (Action act : actions) {
 				if (serial.length() > len + 1)
@@ -184,7 +184,7 @@ public class Flow {
 		}
 
 		serial = serial.concat("}");
-		return serial.toString();
+		return serial;
 	}
 
 	public String deleteString() {
