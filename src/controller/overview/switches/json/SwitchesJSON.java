@@ -36,7 +36,7 @@ public class SwitchesJSON {
 				switchDpids.add(obj.getString("dpid"));
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Failed to read JSON from URL, controller may not be running.");
 		}
 
 		for (String dpid : switchDpids) {

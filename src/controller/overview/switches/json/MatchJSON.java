@@ -33,7 +33,7 @@ public class MatchJSON {
 			match.setDataLayerSource(obj.getString("dataLayerSource"));
 		if (!obj.getString("dataLayerType").equals("0x0000"))
 			match.setDataLayerType(obj.getString("dataLayerType"));
-		if (obj.getInt("dataLayerVirtualLan") != -1)
+		if (obj.getInt("dataLayerVirtualLan") > 0)
 			match.setDataLayerVLAN(String.valueOf(obj
 					.getInt("dataLayerVirtualLan")));
 		if (obj.getInt("dataLayerVirtualLanPriorityCodePoint") != 0)
@@ -59,7 +59,8 @@ public class MatchJSON {
 		if (obj.getInt("transportSource") != 0)
 			match.setTransportSource(String.valueOf(obj
 					.getInt("transportSource")));
-		match.setWildcards(String.valueOf(obj.getLong("wildcards")));
+		if(obj.getLong("wildcards") != 4194302)
+			match.setWildcards(String.valueOf(obj.getLong("wildcards")));
 
 		return match;
 	}

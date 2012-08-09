@@ -35,8 +35,7 @@ public class ControllerJSON {
 				info.add(1,"No");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Failed to get read JSON Object");
+			System.out.println("Failed to read JSON from URL, controller may not be running.");
 		}
 
 		// Get the JVM memory bloat
@@ -47,8 +46,7 @@ public class ControllerJSON {
 			long total = obj.getLong("total");
 			info.add(2,FormatLong.formatBytes(free,true,false) + " free of " + FormatLong.formatBytes(total,true,false));
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Failed to get read JSON Object");
+			System.out.println("Failed to read JSON from URL, controller may not be running.");
 		}
 
 		// Get the modules loaded for the controller
@@ -64,13 +62,12 @@ public class ControllerJSON {
 						modules = modules.concat(key + " ");
 					}
 				} catch (Exception e) {
-					System.out.println("swag sack");
+					// Fail silently
 				}
 			}
 			info.add(modules);
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Failed to get read JSON Object");
+			System.out.println("Failed to read JSON from URL, controller may not be running.");
 		}
 
 		return info;

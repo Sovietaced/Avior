@@ -7,12 +7,16 @@ public class Flow {
 
 	String name, priority, cookie, idleTimeOut, hardTimeOut, outPort, sw,
 			durationSeconds, packetCount, byteCount;
+	List<Action> actions = new ArrayList<Action>();
+	Match match = new Match();
 
 	public Flow() {
 	}
 
 	public Flow(String selectedSwitch) {
 		sw = selectedSwitch;
+		actions = new ArrayList<Action>();
+		match = new Match();
 	}
 	
 	public String getPacketCount() {
@@ -38,9 +42,6 @@ public class Flow {
 	public void setDurationSeconds(String durationSeconds) {
 		this.durationSeconds = durationSeconds;
 	}
-
-	List<Action> actions = new ArrayList<Action>();
-	Match match = new Match();
 
 	public String getSwitch() {
 		return sw;
@@ -99,7 +100,7 @@ public class Flow {
 	}
 
 	public List<Action> getActions() {
-		return actions;
+		return this.actions;
 	}
 
 	public void setActions(List<Action> actions) {
@@ -189,5 +190,14 @@ public class Flow {
 
 	public String deleteString() {
 		return "{\"name\":\"" + name + "\"}";
+	}
+	
+	public boolean equals(Flow otherFlow) {
+		if(!this.actionsToString().equals(otherFlow.actionsToString()))
+				return false;
+		if(!this.getMatch().Serialize().equals(otherFlow.getMatch().Serialize()))
+			return false;
+	    
+	    return true;
 	}
 }

@@ -7,15 +7,6 @@ Features
 * Adding, modification, deletion of flows
 * Controller, Switch, Device statistics
 
-Compiling
----------
-In order to compile Avior you will need to do a couple of things. 
-1. Clone the repository
-2. Import the project into eclipse
-3. Configure your build path to include the appropriate SWT jar for your operating system. 
-By default the 64 bit Linux jar is included. If you are using Windows or Mac, you will need to remove this and add the appropriate one
-from the Lib folder.
-
 Compatability 
 --------------
 * 64 bit : Linux, Windows, OSX

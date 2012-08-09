@@ -425,7 +425,7 @@ public class StaticFlowManager {
 		btnNewFLow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				clearFlowTable();
+				setupNewFlow();
 			}
 		});
 
@@ -454,7 +454,7 @@ public class StaticFlowManager {
 								// Push the flow and get the response
 								String response = FlowManagerPusher.push(flow);
 
-								if (response.equals("Entry pushed")) {
+								if (response.equals("Flow successfully pushed!")) {
 									populateFlowTree(tree_switches
 											.indexOf(tree_switches
 													.getSelection()[0]));

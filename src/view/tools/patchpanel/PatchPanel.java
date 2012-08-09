@@ -130,8 +130,12 @@ public class PatchPanel {
 								.getName());
 					}
 				}
+				else {
+					new TreeItem(tree_patches, SWT.NONE).setText("None Set");
+				}
 			}
-		} else {
+		}
+		else {
 			new TreeItem(tree_patches, SWT.NONE).setText("None Set");
 		}
 	}

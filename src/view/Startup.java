@@ -127,7 +127,7 @@ public class Startup {
 					"img/floodlight.png"));
 			Image floodlight = new Image(display, ideaImage);
 			Label lblNewLabel_2 = new Label(shell, SWT.NONE);
-			lblNewLabel_2.setBounds(0, 0, 470, 278);
+			lblNewLabel_2.setBounds(20, 0, 470, 278);
 			lblNewLabel_2.setImage(floodlight);
 		} catch (Exception j) {
 			System.out.println("Error Code I-1");
