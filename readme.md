@@ -9,7 +9,9 @@ Features
 
 Compiling
 ---------
-In order to compile Avior you will need to do a couple of things. 
+
+In order to compile Avior you will need to do a couple of things.
+
 1. Clone the repository
 2. Import the project into eclipse
 3. Configure your build path to include the appropriate SWT jar for your operating system. 
