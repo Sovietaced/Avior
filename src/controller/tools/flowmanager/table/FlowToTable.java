@@ -2,7 +2,6 @@ package controller.tools.flowmanager.table;
 
 import org.eclipse.swt.widgets.TableItem;
 
-import view.tools.flowmanager.ActionManager;
 import view.tools.flowmanager.StaticFlowManager;
 import controller.util.ErrorCheck;
 import model.tools.flowmanager.Flow;

@@ -2,11 +2,6 @@
 
 package view;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -67,7 +62,7 @@ public class About {
 
 		Label lblFloodlightOpenflowControl = new Label(shell, SWT.NONE);
 		lblFloodlightOpenflowControl
-				.setText("Avior is a Floodlight Network Management Application");
+				.setText("Avior is a Floodlight Network Management tool");
 		lblFloodlightOpenflowControl.setLayoutData(new GridData(SWT.CENTER,
 				SWT.CENTER, false, false, 1, 1));
 		new Label(shell, SWT.NONE);
@@ -85,8 +80,13 @@ public class About {
 		new Label(shell, SWT.NONE);
 
 		Label lblForTheMarist = new Label(shell, SWT.NONE);
-		lblForTheMarist.setText("for the Marist Openflow Research Project");
+		lblForTheMarist.setText("for the Marist/IBM Joint Study");
 		lblForTheMarist.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
+				false, false, 1, 1));
+		new Label(shell, SWT.NONE);
+		Label lbl = new Label(shell, SWT.NONE);
+		lbl.setText("OpenFlow Research Project");
+		lbl.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
 				false, false, 1, 1));
 		new Label(shell, SWT.NONE);
 		new Label(shell, SWT.NONE);

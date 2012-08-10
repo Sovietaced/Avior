@@ -12,7 +12,6 @@ import controller.util.JSONObject;
 
 import model.overview.Port;
 import model.overview.Switch;
-import model.tools.flowmanager.Flow;
 
 import view.Gui;
 

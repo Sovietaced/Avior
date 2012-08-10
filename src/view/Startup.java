@@ -1,10 +1,7 @@
 package view;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.UnknownHostException;
 
 import org.eclipse.swt.widgets.Button;

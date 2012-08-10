@@ -111,6 +111,7 @@ public class FlowManagerPusher {
 				+ ":8080/wm/staticflowentrypusher/clear/" + dpid + "/json";
 		URL url = new URL(urlString);
 		URLConnection conn = url.openConnection();
+		@SuppressWarnings("unused")
 		InputStream is = conn.getInputStream();
 	}
 

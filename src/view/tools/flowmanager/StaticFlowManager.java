@@ -16,7 +16,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -50,8 +49,6 @@ public class StaticFlowManager {
 	protected TableEditor editor;
 	final int EDITABLECOLUMN = 1;
 	public static Switch currSwitch;
-	public static List<Action> actions;
-	public static Match match;
 	public static Flow flow;
 	protected List<Switch> switches = new ArrayList<Switch>();
 	protected List<Flow> flows = new ArrayList<Flow>();

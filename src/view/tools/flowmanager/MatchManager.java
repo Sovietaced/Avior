@@ -10,7 +10,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -29,7 +28,6 @@ import org.eclipse.swt.custom.TableEditor;
 
 import controller.tools.flowmanager.push.MatchManagerPusher;
 import controller.tools.flowmanager.table.MatchToTable;
-import controller.util.ErrorCheck;
 import controller.util.JSONException;
 
 
@@ -39,11 +37,9 @@ public class MatchManager {
 	protected Table table_match;
 	protected Combo combo;
 	protected Composite composite_3;
-	String currAction, actionType;
 	protected String[][] matchTableFormat;
 	final int EDITABLECOLUMN = 1;
 	protected static TableEditor editor;
-	protected boolean delete;
 	protected List<Action> actions;
 
 	public MatchManager() {
@@ -72,7 +68,6 @@ public class MatchManager {
 
 		// Clear the table of any data
 		table_match.removeAll();
-		// currAction = selectedAction;
 		try {
 			matchTableFormat = MatchToTable.getMatchTableFormat();
 		} catch (JSONException e) {

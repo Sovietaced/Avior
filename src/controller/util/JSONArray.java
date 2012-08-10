@@ -84,11 +84,13 @@ public class JSONArray {
 	/**
 	 * The arrayList where the JSONArray's properties are kept.
 	 */
+	@SuppressWarnings("rawtypes")
 	private final ArrayList myArrayList;
 
 	/**
 	 * Construct an empty JSONArray.
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSONArray() {
 		this.myArrayList = new ArrayList();
 	}
@@ -101,6 +103,7 @@ public class JSONArray {
 	 * @throws JSONException
 	 *             If there is a syntax error.
 	 */
+	@SuppressWarnings("unchecked")
 	public JSONArray(JSONTokener x) throws JSONException {
 		this();
 		if (x.nextClean() != '[') {
@@ -153,6 +156,7 @@ public class JSONArray {
 	 * @param collection
 	 *            A Collection.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONArray(Collection collection) {
 		this.myArrayList = new ArrayList();
 		if (collection != null) {
@@ -596,7 +600,7 @@ public class JSONArray {
 	 *            A Collection value.
 	 * @return this.
 	 */
-	public JSONArray put(Collection value) {
+	public JSONArray put(@SuppressWarnings("rawtypes") Collection value) {
 		this.put(new JSONArray(value));
 		return this;
 	}
@@ -649,7 +653,7 @@ public class JSONArray {
 	 *            A Map value.
 	 * @return this.
 	 */
-	public JSONArray put(Map value) {
+	public JSONArray put(@SuppressWarnings("rawtypes") Map value) {
 		this.put(new JSONObject(value));
 		return this;
 	}
@@ -663,6 +667,7 @@ public class JSONArray {
 	 *            JSONObject.NULL object.
 	 * @return this.
 	 */
+	@SuppressWarnings("unchecked")
 	public JSONArray put(Object value) {
 		this.myArrayList.add(value);
 		return this;
@@ -698,7 +703,7 @@ public class JSONArray {
 	 * @throws JSONException
 	 *             If the index is negative or if the value is not finite.
 	 */
-	public JSONArray put(int index, Collection value) throws JSONException {
+	public JSONArray put(int index, @SuppressWarnings("rawtypes") Collection value) throws JSONException {
 		this.put(index, new JSONArray(value));
 		return this;
 	}
@@ -770,7 +775,7 @@ public class JSONArray {
 	 *             If the index is negative or if the the value is an invalid
 	 *             number.
 	 */
-	public JSONArray put(int index, Map value) throws JSONException {
+	public JSONArray put(int index, @SuppressWarnings("rawtypes") Map value) throws JSONException {
 		this.put(index, new JSONObject(value));
 		return this;
 	}
@@ -791,6 +796,7 @@ public class JSONArray {
 	 *             If the index is negative or if the the value is an invalid
 	 *             number.
 	 */
+	@SuppressWarnings("unchecked")
 	public JSONArray put(int index, Object value) throws JSONException {
 		JSONObject.testValidity(value);
 		if (index < 0) {

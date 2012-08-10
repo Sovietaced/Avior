@@ -2,8 +2,6 @@ package controller.util;
 
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ErrorCheck {
 

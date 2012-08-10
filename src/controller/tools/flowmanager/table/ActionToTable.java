@@ -10,7 +10,6 @@ import model.overview.Port;
 import model.overview.Switch;
 import model.tools.flowmanager.Action;
 import view.tools.flowmanager.ActionManager;
-import view.tools.flowmanager.MatchManager;
 import view.tools.flowmanager.StaticFlowManager;
 
 public class ActionToTable {

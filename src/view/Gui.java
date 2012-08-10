@@ -33,7 +33,6 @@ import view.tools.flowmanager.StaticFlowManager;
 import view.tools.patchpanel.PatchPanel;
 
 import controller.overview.json.ControllerJSON;
-import controller.overview.json.DevicesJSON;
 import controller.overview.switches.json.SwitchesJSON;
 import controller.overview.table.DeviceToTable;
 import controller.overview.table.FlowToTable;
@@ -55,6 +54,7 @@ public class Gui {
 	protected Display display;
 	public static String IP;
 	static List<Switch> switches = new ArrayList<Switch>();
+	static List<String> controllerInfo = new ArrayList<String>();
 
 	/**
 	 * Launch the application.
@@ -113,9 +113,6 @@ public class Gui {
 	}
 
 	private void displayControllerInfo() {
-
-		List<String> controllerInfo = new ArrayList<String>();
-
 		try {
 			controllerInfo = ControllerJSON.getControllerInfo();
 		} catch (JSONException e) {
@@ -178,9 +175,9 @@ public class Gui {
 		// Get the most recent data about the switches
 		updateSwitchesData();
 		
-			for (String[] data : SwitchToTable.getSwitchTableFormat(switches)) {
-				new TableItem(switches_table, SWT.NONE).setText(data);
-			}
+		for (String[] data : SwitchToTable.getSwitchTableFormat(switches)) {
+			new TableItem(switches_table, SWT.NONE).setText(data);
+		}
 			
 		shell.setText("Overview for all switches");
 	}
@@ -210,6 +207,7 @@ public class Gui {
 			for (String[] data : PortToTable.getPortTableFormat(sw.getPorts())) {
 				new TableItem(table_ports, SWT.NONE).setText(data);
 			}
+			
 		shell.setText("Overview for switch : " + sw.getDpid());
 		lblManufacturer.setText("Manufacturer : "
 				+ sw.getManufacturerDescription());
