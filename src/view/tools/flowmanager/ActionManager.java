@@ -9,7 +9,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -33,18 +32,17 @@ import org.eclipse.swt.custom.TableEditor;
 
 import controller.tools.flowmanager.push.ActionManagerPusher;
 import controller.tools.flowmanager.table.ActionToTable;
-import controller.util.ErrorCheck;
 
 public class ActionManager {
 
-	protected Shell shell;
+	protected static Shell shell;
 	protected Table table_action;
 	protected Combo combo;
 	protected Composite composite_3;
-	protected String currAction, actionType, flowName, switchID;
-	protected String[][] actionsSummary, actionTableFormat;
+	protected String currAction;
+	protected String[][] actionTableFormat;
 	final int EDITABLECOLUMN = 1;
-	protected TableEditor editor;
+	protected static TableEditor editor;
 	protected Tree tree;
 	protected List<Action> actions;
 
@@ -67,51 +65,19 @@ public class ActionManager {
 		}
 		shell.dispose();
 	}
-	
-	protected void displayError(String param){
-		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-				| SWT.OK);
+
+	public static void displayError(String msg) {
+		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 		mb.setText("Error!");
-		mb.setMessage("The value number must be " + param + ". Please check your entry.");
+		mb.setMessage(msg);
 		mb.open();
 	}
 	
-	protected boolean errorChecksPassed(TableItem[] items){
-		
-		if(currAction.equals("output") || 
-				currAction.equals("set-vlan-id") || 
-				currAction.equals("set-vlan-priority") ||
-				currAction.equals("set-tos-bits") || 
-				currAction.equals("set-src-port")||
-				currAction.equals("set-dst-port")){
-			if(!ErrorCheck.isNumeric(items[0].getText(1))){
-				displayError("an integer");
-				return false;
-			}
+	public static void disposeEditor(){
+		// Dispose the editor do it doesn't leave a ghost table item
+		if (editor.getEditor() != null) {
+			editor.getEditor().dispose();
 		}
-		
-		if(currAction.equals("enqueue")){
-			if(!ErrorCheck.isNumeric(items[0].getText(1)) || !ErrorCheck.isNumeric(items[1].getText(1))){
-				displayError("an integer");
-				return false;
-			}
-		}
-		
-		if(currAction.equals("set-src-mac") || currAction.equals("set-dst-mac")){
-			if(!ErrorCheck.isMac(items[0].getText(1))){
-			displayError("a proper MAC address");
-				return false;
-			}
-		}
-		
-		if(currAction.equals("set-src-ip") || currAction.equals("set-dst-ip")){
-			if(!ErrorCheck.isIP(items[0].getText(1))){
-			displayError("a proper IP address");
-				return false;
-			}
-		}
-		
-		return true;
 	}
 
 	// This method will populate the table with a list of the current actions
@@ -141,8 +107,6 @@ public class ActionManager {
 	protected void populateActionTable(int index) {
 
 		currAction = tree.getItem(index).getText();
-		actionType = currAction;
-		// Clear the table of any data
 		table_action.removeAll();
 
 		for (String[] s : ActionToTable.getActionTableFormat(index)) {
@@ -158,9 +122,9 @@ public class ActionManager {
 		// Clear the tables of any data
 		table_action.removeAll();
 
-			for (String[] s : ActionToTable.getNewActionTableFormat(currAction)) {
-				new TableItem(table_action, SWT.NO_FOCUS).setText(s);
-			}
+		for (String[] s : ActionToTable.getNewActionTableFormat(currAction)) {
+			new TableItem(table_action, SWT.NO_FOCUS).setText(s);
+		}
 	}
 
 	/**
@@ -247,10 +211,7 @@ public class ActionManager {
 			@Override
 			public void handleEvent(Event e) {
 
-				// Dispose the editor do it doesn't leave a ghost table item
-				if (editor.getEditor() != null) {
-					editor.getEditor().dispose();
-				}
+				disposeEditor();
 				setupAction(combo.getItem(combo.getSelectionIndex()));
 			}
 		});
@@ -275,31 +236,20 @@ public class ActionManager {
 			public void widgetSelected(SelectionEvent e) {
 				if (currAction != null) {
 					if (!table_action.getItems()[0].getText(1).isEmpty()) {
-						if (errorChecksPassed(table_action.getItems())) {
+						if (ActionToTable.errorChecksPassed(
+								StaticFlowManager.getCurrSwitch(), currAction,
+								table_action.getItems())) {
 							ActionManagerPusher.addAction(
 									table_action.getItems(), currAction);
 
-							// Dispose the editor do it doesn't leave a ghost
-							// table
-							// item
-							if (editor.getEditor() != null) {
-								editor.getEditor().dispose();
-							}
+							disposeEditor();
 							populateActionTree();
 						}
 					} else {
-						MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-								| SWT.OK);
-						mb.setText("Error!");
-						mb.setMessage("You must enter a value before you save an action!");
-						mb.open();
+						displayError("You must enter a value before you save an action!");
 					}
 				} else {
-					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-							| SWT.OK);
-					mb.setText("Error!");
-					mb.setMessage("You must create an action to save!");
-					mb.open();
+					displayError("You must create an action to save!");
 				}
 			}
 		});
@@ -330,10 +280,7 @@ public class ActionManager {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				// Dispose the editor so that we don't leave a ghost table
-				if (editor.getEditor() != null) {
-					editor.getEditor().dispose();
-				}
+				disposeEditor();
 
 				// Populate the action table, if we actually have actions.
 				if (!tree.getSelection()[0].getText(0).equals("None Set"))
@@ -365,10 +312,7 @@ public class ActionManager {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				// Clean up any previous editor control
-				Control oldEditor = editor.getEditor();
-				if (oldEditor != null)
-					oldEditor.dispose();
+				disposeEditor();
 
 				// Identify the selected row
 				TableItem item = (TableItem) e.item;

@@ -12,7 +12,6 @@ public class ActionManagerPusher {
 
 	public static void addAction(TableItem[] items, String actionType) {
 
-		System.out.println("swag");
 		List<Action> actions = StaticFlowManager.getActions();
 		Action action;
 		

@@ -2,7 +2,15 @@ package controller.tools.flowmanager.table;
 
 import java.util.List;
 
+import org.eclipse.swt.widgets.TableItem;
+
+import controller.util.ErrorCheck;
+
+import model.overview.Port;
+import model.overview.Switch;
 import model.tools.flowmanager.Action;
+import view.tools.flowmanager.ActionManager;
+import view.tools.flowmanager.MatchManager;
 import view.tools.flowmanager.StaticFlowManager;
 
 public class ActionToTable {
@@ -55,5 +63,64 @@ public class ActionToTable {
 					{ "Type", action.getType() } };
 			return act;
 		}
+	}
+
+	public static boolean errorChecksPassed(Switch sw, String currAction,
+			TableItem[] items) {
+
+		List<Port> ports = sw.getPorts();
+		boolean checkPorts = false;
+
+		if (currAction.equals("output") || currAction.equals("set-vlan-id")
+				|| currAction.equals("set-vlan-priority")
+				|| currAction.equals("set-tos-bits")
+				|| currAction.equals("set-src-port")
+				|| currAction.equals("set-dst-port")) {
+			checkPorts = true;
+			if (!ErrorCheck.isNumeric(items[0].getText(1))) {
+				ActionManager
+						.displayError("The value number must be an integer. Please check your entry.");
+				return false;
+			}
+		}
+
+		if (currAction.equals("enqueue")) {
+			if (!ErrorCheck.isNumeric(items[0].getText(1))
+					|| !ErrorCheck.isNumeric(items[1].getText(1))) {
+				ActionManager.displayError("an integer");
+				return false;
+			}
+		}
+
+		if (currAction.equals("set-src-mac")
+				|| currAction.equals("set-dst-mac")) {
+			if (!ErrorCheck.isMac(items[0].getText(1))) {
+				ActionManager
+						.displayError("The value number must be a proper MAC address. Please check your entry.");
+				return false;
+			}
+		}
+
+		if (currAction.equals("set-src-ip") || currAction.equals("set-dst-ip")) {
+			if (!ErrorCheck.isIP(items[0].getText(1))) {
+				ActionManager
+						.displayError("The value number must be a proper IP address. Please check your entry.");
+				return false;
+			}
+		}
+
+		if (checkPorts) {
+			for (Port port : ports) {
+				if (items[0].getText(1).equals(port.getPortNumber())) {
+					return true;
+				}
+			}
+
+			ActionManager
+					.displayError("That port does not exist on the switch!");
+			return false;
+		}
+
+		return true;
 	}
 }

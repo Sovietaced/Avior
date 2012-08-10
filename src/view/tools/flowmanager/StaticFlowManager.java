@@ -44,12 +44,12 @@ import view.Gui;
 
 public class StaticFlowManager {
 
-	protected Shell shell;
+	protected static Shell shell;
 	public Tree tree_switches, tree_flows;
 	protected Table table_flow;
 	protected TableEditor editor;
 	final int EDITABLECOLUMN = 1;
-	public static String currSwitch;
+	public static Switch currSwitch;
 	public static List<Action> actions;
 	public static Match match;
 	public static Flow flow;
@@ -96,7 +96,30 @@ public class StaticFlowManager {
 			}
 		}
 	}
+	
+	public void disposeEditor(){
+		// Dispose the editor do it doesn't leave a ghost table item
+		if (editor.getEditor() != null) {
+			editor.getEditor().dispose();
+		}
+	}
+	
+	public static void displayError(String msg){
+		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+				| SWT.OK);
+		mb.setText("Error!");
+		mb.setMessage(msg);
+		mb.open();
+	}
 
+	public static void displayStatus(String msg){
+		MessageBox mb = new MessageBox(shell,
+				SWT.ICON_WORKING | SWT.OK);
+		mb.setText("Status");
+		mb.setMessage(msg);
+		mb.open();
+	}
+	
 	public static Flow getFlow() {
 		return flow;
 	}
@@ -123,24 +146,12 @@ public class StaticFlowManager {
 		flow.setMatch(m);
 	}
 
-	public static String getCurrSwitch() {
+	public static Switch getCurrSwitch() {
 		return currSwitch;
 	}
 
-	public static void setCurrSwitch(String dpid) {
-		currSwitch = dpid;
-	}
-
-	private void clearFlowTable() {
-		table_flow.removeAll();
-
-		String[][] flowTable = FlowToTable.getNewFlowTableFormat();
-
-		if (flowTable != null) {
-			for (String[] row : flowTable) {
-				new TableItem(table_flow, SWT.NONE).setText(row);
-			}
-		}
+	public static void setCurrSwitch(Switch sw) {
+		currSwitch = sw;
 	}
 
 	private void populateSwitchTree() {
@@ -163,14 +174,14 @@ public class StaticFlowManager {
 
 		tree_flows.removeAll();
 		table_flow.removeAll();
-		currSwitch = switches.get(index).getDpid();
+		currSwitch = switches.get(index);
 		flow = null;
 		// This just makes sure the selection is noted in the event of
 		// pre-selection
 		tree_switches.select(tree_switches.getItem(index));
 		try {
 			// Here we get the static flows only
-			flows = StaticFlowManagerJSON.getFlows(currSwitch);
+			flows = StaticFlowManagerJSON.getFlows(currSwitch.getDpid());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,29 +206,19 @@ public class StaticFlowManager {
 		table_flow.removeAll();
 		flow = f;
 
-		String[][] flowTable = null;
-		flowTable = FlowToTable.getFlowTableFormat(f);
-
-		if (flowTable != null) {
-			for (String[] row : flowTable) {
+			for (String[] row : FlowToTable.getFlowTableFormat(f)) {
 				new TableItem(table_flow, SWT.NONE).setText(row);
-			}
 		}
 	}
 
 	// This method creates a new flow with default values.
 	public void setupNewFlow() {
 
-		flow = new Flow(getCurrSwitch());
+		flow = new Flow(currSwitch.getDpid());
 		table_flow.removeAll();
 
-		String[][] flowTable = null;
-		flowTable = FlowToTable.getNewFlowTableFormat();
-
-		if (flowTable != null) {
-			for (String[] row : flowTable) {
+			for (String[] row : FlowToTable.getNewFlowTableFormat()) {
 				new TableItem(table_flow, SWT.NONE).setText(row);
-			}
 		}
 	}
 
@@ -234,6 +235,7 @@ public class StaticFlowManager {
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
+				// Create an "are you sure" box in the event that there is unsaved progress
 				if (unsavedProgress) {
 					int style = SWT.APPLICATION_MODAL | SWT.YES | SWT.NO;
 					MessageBox messageBox = new MessageBox(shell, style);
@@ -301,9 +303,11 @@ public class StaticFlowManager {
 		table_flow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (table_flow.getSelection()[0].getText().equals("Actions")) {
+				String selection = table_flow.getSelection()[0].getText();
+				
+				if (selection.equals("Actions")) {
 					new ActionManager();
-				} else if (table_flow.getSelection()[0].getText().equals(
+				} else if (selection.equals(
 						"Match")) {
 					new MatchManager();
 				}
@@ -320,10 +324,8 @@ public class StaticFlowManager {
 		table_flow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// Clean up any previous editor control
-				Control oldEditor = editor.getEditor();
-				if (oldEditor != null)
-					oldEditor.dispose();
+				
+				disposeEditor();
 
 				// Identify the selected row
 				TableItem item = (TableItem) e.item;
@@ -366,10 +368,10 @@ public class StaticFlowManager {
 		tree_switches.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				TreeItem[] selection_switches = tree_switches.getSelection();
-				if (selection_switches.length != 0) {
+				TreeItem[] switch_selection = tree_switches.getSelection();
+				if (switch_selection.length != 0) {
 					populateFlowTree(tree_switches
-							.indexOf(selection_switches[0]));
+							.indexOf(switch_selection[0]));
 				}
 			}
 		});
@@ -451,6 +453,8 @@ public class StaticFlowManager {
 								// Debugging
 								System.out.println(flow.serialize());
 
+								if(FlowToTable.errorChecksPassed(table_flow.getItems())){
+									
 								// Push the flow and get the response
 								String response = FlowManagerPusher.push(flow);
 
@@ -461,36 +465,22 @@ public class StaticFlowManager {
 									unsavedProgress = false;
 								}
 
-								// Dispose the editor do it doesn't leave a
-								// ghost table item
-								if (editor.getEditor() != null)
-									editor.getEditor().dispose();
+								disposeEditor();
 
 								// Display the response from pushing the flow
-								MessageBox mb = new MessageBox(shell,
-										SWT.ICON_ERROR | SWT.OK);
-								mb.setText("Status");
-								mb.setMessage(response);
-								mb.open();
+								displayStatus(response);
+								}
 
 							} else {
 								// Error message in the event that the flow
 								// hasn't been given a name
-								MessageBox mb = new MessageBox(shell,
-										SWT.ICON_ERROR | SWT.OK);
-								mb.setText("Error");
-								mb.setMessage("Your flow must have a name!");
-								mb.open();
+								displayError("Your flow must have a name");
 							}
 						}
 						// Error message in the event that the button is pushed
 						// and there is no flow to push
 						else {
-							MessageBox mb = new MessageBox(shell,
-									SWT.ICON_ERROR | SWT.OK);
-							mb.setText("Error");
-							mb.setMessage("You do not have a flow to push!");
-							mb.open();
+							displayError("You do not have a flow to push!");
 						}
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -529,17 +519,10 @@ public class StaticFlowManager {
 								populateFlowTree(tree_switches
 										.indexOf(tree_switches.getSelection()[0]));
 
-							// Dispose the editor do it doesn't leave a ghost
-							// table item
-							if (editor.getEditor() != null)
-								editor.getEditor().dispose();
+							disposeEditor();
 
 							// Displays the response
-							MessageBox mb = new MessageBox(shell,
-									SWT.ICON_ERROR | SWT.OK);
-							mb.setText("Status");
-							mb.setMessage(response);
-							mb.open();
+							displayStatus(response);
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -549,11 +532,7 @@ public class StaticFlowManager {
 						e1.printStackTrace();
 					}
 				} else {
-					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-							| SWT.OK);
-					mb.setText("Error");
-					mb.setMessage("You must select a flow to delete!");
-					mb.open();
+					displayError("You must select a flow to delete!");
 				}
 			}
 		});
@@ -575,7 +554,7 @@ public class StaticFlowManager {
 					try {
 						// Delete all the flows for the current switch, populate
 						// the table with the new information
-						FlowManagerPusher.deleteAll(getCurrSwitch());
+						FlowManagerPusher.deleteAll(currSwitch.getDpid());
 						populateFlowTree(tree_switches.indexOf(tree_switches
 								.getSelection()[0]));
 					} catch (IOException e1) {

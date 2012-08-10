@@ -39,7 +39,7 @@ import view.Gui;
 
 public class PatchPanel {
 
-	protected Shell shell;
+	protected static Shell shell;
 	protected Table table;
 	protected Display display;
 	protected Table table_1, table_ports1, table_ports2;
@@ -66,6 +66,21 @@ public class PatchPanel {
 		}
 	}
 
+	public void displayError(String msg){
+		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+				| SWT.OK);
+		mb.setText("Patch Panel");
+		mb.setMessage(msg);
+		mb.open();
+	}
+	
+	public void displayStatus(String msg){
+		MessageBox mb = new MessageBox(shell,
+				SWT.ICON_WORKING | SWT.OK);
+		mb.setText("Status");
+		mb.setMessage(msg);
+		mb.open();
+	}
 	private void populateSwitchTree() {
 
 		// Clear the trees of any old data
@@ -364,42 +379,22 @@ public class PatchPanel {
 						if (!table_1.getItems()[0].getText(1).equals(
 								table_1.getItems()[0].getText(2))) {
 								if(freeToPatch(table_1.getItems())){
-									MessageBox mb = new MessageBox(shell,
-											SWT.ICON_ERROR | SWT.OK);
-									mb.setText("Patch Panel");
-									mb.setMessage(PatchPanelPusher.push(
+									displayStatus(PatchPanelPusher.push(
 											table_1.getItems(), currSwitch));
-									mb.open();
 									populatePatchTree(tree_switches
 											.indexOf(tree_switches.getSelection()[0]));
 								}
 								else{
-									MessageBox mb = new MessageBox(shell,
-											SWT.ICON_ERROR | SWT.OK);
-									mb.setText("Patch Panel");
-									mb.setMessage("Another patch that uses those ports already exists!");
-									mb.open();
+									displayError("Another patch that uses those ports already exists!");
 								}
 						} else {
-							MessageBox mb = new MessageBox(shell,
-									SWT.ICON_ERROR | SWT.OK);
-							mb.setText("Patch Panel");
-							mb.setMessage("You cannot make a patch with two of the same ports!");
-							mb.open();
+							displayError("You cannot make a patch with two of the same ports!");
 						}
 					} else {
-						MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-								| SWT.OK);
-						mb.setText("Patch Panel");
-						mb.setMessage("Your new patch is missing a port! Make sure you have set both before attempting to patch!");
-						mb.open();
+						displayError("Your new patch is missing a port! Make sure you have set both before attempting to patch!");
 					}
 				} else {
-					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-							| SWT.OK);
-					mb.setText("Patch Panel");
-					mb.setMessage("You must first create a patch!");
-					mb.open();
+					displayError("You must first create a patch!");
 				}
 			}
 		});
@@ -428,11 +423,7 @@ public class PatchPanel {
 										.indexOf(tree_switches.getSelection()[0]));
 							}
 
-							MessageBox mb = new MessageBox(shell,
-									SWT.ICON_ERROR | SWT.OK);
-							mb.setText("Status");
-							mb.setMessage(response);
-							mb.open();
+							displayStatus(response);
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -442,11 +433,7 @@ public class PatchPanel {
 						e1.printStackTrace();
 					}
 				} else {
-					MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-							| SWT.OK);
-					mb.setText("Error");
-					mb.setMessage("You must select a patch flow to delete!");
-					mb.open();
+					displayError("You must select a patch flow to delete!");
 				}
 			}
 		});

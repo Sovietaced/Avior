@@ -16,7 +16,7 @@ public class ErrorCheck {
 
 	public static boolean isMac(String str) {
 		return str
-				.matches("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
+				.matches("([a-fA-F0-9]{2}[:\\-\\.]){5}[a-fA-F0-9]{2}");
 	}
 
 	public static boolean isIP(String str) {

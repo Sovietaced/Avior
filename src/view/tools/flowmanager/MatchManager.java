@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -28,12 +29,13 @@ import org.eclipse.swt.custom.TableEditor;
 
 import controller.tools.flowmanager.push.MatchManagerPusher;
 import controller.tools.flowmanager.table.MatchToTable;
+import controller.util.ErrorCheck;
 import controller.util.JSONException;
 
 
 public class MatchManager {
 
-	protected Shell shell;
+	protected static Shell shell;
 	protected Table table_match;
 	protected Combo combo;
 	protected Composite composite_3;
@@ -88,20 +90,30 @@ public class MatchManager {
 		}
 	}
 
-	// protected void populateNewMatchTable() {
-	//
-	// // Clear the tables of any data
-	// table_match.removeAll();
-	//
-	// matchTableFormat = MatchToTable.getNewMatchTableFormat();
-	//
-	// if (matchTableFormat != null) {
-	// for (String[] s : matchTableFormat) {
-	// new TableItem(table_match, SWT.NO_FOCUS).setText(s);
-	// }
-	// }
-	// }
-
+	 protected void clearValues() {
+	
+	 // Clear the tables of any data
+	 table_match.removeAll();
+	
+	 for (String[] s : MatchToTable.getNewMatchTableFormat()) {
+		 new TableItem(table_match, SWT.NO_FOCUS).setText(s);
+		 }
+	 }
+	 
+	 public static void displayError(String msg){
+			MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+					| SWT.OK);
+			mb.setText("Error!");
+			mb.setMessage(msg);
+			mb.open();
+		}
+		
+	 public static void disposeEditor(){
+			// Dispose the editor do it doesn't leave a ghost table item
+			if (editor.getEditor() != null) {
+				editor.getEditor().dispose();
+			}
+		}
 	/**
 	 * Create contents of the window.
 	 */
@@ -167,7 +179,7 @@ public class MatchManager {
 		btnClear.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// populateNewMatchTable();
+				clearValues();
 			}
 		});
 
@@ -175,13 +187,12 @@ public class MatchManager {
 		btnSave.setBounds(254, 0, 91, 29);
 		btnSave.setText("Save");
 		btnSave.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
-				StaticFlowManager.setMatch(MatchManagerPusher.addMatch(table_match
+				if(MatchToTable.errorChecksPassed(StaticFlowManager.getCurrSwitch(),table_match.getItems())){
+					StaticFlowManager.setMatch(MatchManagerPusher.addMatch(table_match
 						.getItems()));
-				// Dispose the editor do it doesn't leave a ghost table item
-				if (editor.getEditor() != null) {
-					editor.getEditor().dispose();
+					
+					disposeEditor();
 				}
 			}
 		});
@@ -205,13 +216,9 @@ public class MatchManager {
 		editor.minimumWidth = 50;
 
 		table_match.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				// Clean up any previous editor control
-				Control oldEditor = editor.getEditor();
-				if (oldEditor != null)
-					oldEditor.dispose();
+				disposeEditor();
 
 				// Identify the selected row
 				TableItem item = (TableItem) e.item;
@@ -223,7 +230,6 @@ public class MatchManager {
 				Text newEditor = new Text(table_match, SWT.NONE);
 				newEditor.setText(item.getText(EDITABLECOLUMN));
 				newEditor.addModifyListener(new ModifyListener() {
-					@Override
 					public void modifyText(ModifyEvent me) {
 						Text text = (Text) editor.getEditor();
 						editor.getItem()
