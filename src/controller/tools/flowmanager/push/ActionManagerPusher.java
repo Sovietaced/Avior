@@ -43,6 +43,7 @@ public class ActionManagerPusher {
 		return false;
 	}
 
+	// Removes the specified action by it's type
 	public static void removeAction(String actionType) {
 		List<Action> actions = StaticFlowManager.getActions();
 		int actionIndex = -1;
@@ -56,6 +57,7 @@ public class ActionManagerPusher {
 		StaticFlowManager.setActions(actions);
 	}
 
+	// Removes all the actions
 	public static void removeAllActions() {
 		List<Action> actions = StaticFlowManager.getActions();
 		actions.clear();

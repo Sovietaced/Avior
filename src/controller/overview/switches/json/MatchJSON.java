@@ -19,12 +19,13 @@ public class MatchJSON {
 	static JSONObject obj;
 	static JSONArray json;
 
+	// This parses JSON from the restAPI to get all the match of a flow for the controller overview
 	public static Match getMatch(JSONObject obj)
 			throws JSONException, IOException {
 		
 		Match match = new Match();
 		
-		// Here we check the values, if they are default we set them to null.
+		// Here we check the values, if they are default we set them emptry strings.
 		// This way they don't confuse the user into thinking they set something
 		// they didn't
 		if (!obj.getString("dataLayerDestination").equals("00:00:00:00:00:00"))

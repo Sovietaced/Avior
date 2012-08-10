@@ -22,6 +22,7 @@ public class ActionManagerJSON {
 	static JSONObject obj;
 	static JSONArray json;
 
+	// This parses JSON from the restAPI to get all the actions and values for that action by it's flow name
 	public static List<Action> getActions(String dpid, String flowName)
 			throws JSONException, IOException {
 

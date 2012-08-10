@@ -35,6 +35,7 @@ import view.tools.patchpanel.PatchPanel;
 import controller.overview.json.ControllerJSON;
 import controller.overview.json.DevicesJSON;
 import controller.overview.switches.json.SwitchesJSON;
+import controller.overview.table.DeviceToTable;
 import controller.overview.table.FlowToTable;
 import controller.overview.table.PortToTable;
 import controller.overview.table.SwitchToTable;
@@ -77,6 +78,14 @@ public class Gui {
 		// If the window is closed, stop the entire application.
 		display.dispose();
 	}
+	
+	public void displayError(String msg){
+		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
+				| SWT.OK);
+		mb.setText("Error!");
+		mb.setMessage(msg);
+		mb.open();
+	}	
 
 	public static List<Switch> getSwitches() {
 		return switches;
@@ -119,27 +128,17 @@ public class Gui {
 			lblInsertJvmMemory.setText(controllerInfo.get(2));
 			lblInsertModules.setText(controllerInfo.get(3));
 		} else {
-			MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-			mb.setText("Error!");
-			mb.setMessage("Failed to display controller, no controller found!");
-			mb.open();
+			displayError("Failed to display controller, no controller found!");
 		}
 	}
 
 	private void displayDevicesData() {
 		// Clears the table prior to populating it with data
 		devices_table.removeAll();
-		String[][] devicesSummaryTable = DevicesJSON.deviceSummariesToTable();
-		if (devicesSummaryTable != null) {
-			for (String[] data : devicesSummaryTable) {
+		
+			for (String[] data : DeviceToTable.deviceSummariesToTable()) {
 				new TableItem(devices_table, SWT.NONE).setText(data);
 			}
-		} else {
-			MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-			mb.setText("Error!");
-			mb.setMessage("Failed to display devices, no devices found!");
-			mb.open();
-		}
 	}
 
 	// This gets all the information switches on the network
@@ -169,8 +168,7 @@ public class Gui {
 		// If there are switches and the tree is not disposed, populate it
 		if (!switches.isEmpty() && trtmSwitches != null) {
 			for (Switch sw : switches) {
-				TreeItem tempSwitch = new TreeItem(trtmSwitches, SWT.NONE);
-				tempSwitch.setText(sw.getDpid());
+				new TreeItem(trtmSwitches, SWT.NONE).setText(sw.getDpid());
 			}
 		}
 	}
@@ -179,13 +177,11 @@ public class Gui {
 	private void loadSwitchesData() {
 		// Get the most recent data about the switches
 		updateSwitchesData();
-		// Get the table represenation of those switches
-		String[][] switchTable = SwitchToTable.getSwitchTableFormat(switches);
-		if (switchTable != null) {
-			for (String[] data : switchTable) {
+		
+			for (String[] data : SwitchToTable.getSwitchTableFormat(switches)) {
 				new TableItem(switches_table, SWT.NONE).setText(data);
 			}
-		}
+			
 		shell.setText("Overview for all switches");
 	}
 
@@ -207,20 +203,13 @@ public class Gui {
 			e.printStackTrace();
 		}
 
-		// FLOWS TO TABLE
-		String[][] flowTable = FlowToTable.getFlowTableFormat(sw.getFlows());
-		if (flowTable != null) {
-			for (String[] data : flowTable) {
+			for (String[] data : FlowToTable.getFlowTableFormat(sw.getFlows())) {
 				new TableItem(table_flows, SWT.NONE).setText(data);
 			}
-		}
-
-		String[][] portTable = PortToTable.getPortTableFormat(sw.getPorts());
-		if (portTable != null) {
-			for (String[] data : portTable) {
+		
+			for (String[] data : PortToTable.getPortTableFormat(sw.getPorts())) {
 				new TableItem(table_ports, SWT.NONE).setText(data);
 			}
-		}
 		shell.setText("Overview for switch : " + sw.getDpid());
 		lblManufacturer.setText("Manufacturer : "
 				+ sw.getManufacturerDescription());
@@ -389,9 +378,6 @@ public class Gui {
 		
 		TreeItem trtmPatchPanel = new TreeItem(trtmTools, SWT.NONE);
 		trtmPatchPanel.setText("Patch Panel");
-
-		// TreeItem trtmFirewall = new TreeItem(trtmTools, SWT.NONE);
-		// trtmFirewall.setText("Firewall");
 
 		switches_table = new Table(composite_1, SWT.BORDER | SWT.FULL_SELECTION);
 		switches_table.setHeaderVisible(true);
@@ -623,14 +609,10 @@ public class Gui {
 		btnManageFlows.addSelectionListener(new SelectionAdapter(){
 		public void widgetSelected(SelectionEvent e){
 			new StaticFlowManager(switches.indexOf(currSwitch));
-
 		}
 	});
 
 		loadSwitchesTree();
-		// No need for this yet, restAPI doesn't serve much useful information
-		// about hosts
-		// updateDevicesDisplay();
 
 		stackLayout.topControl = controllerOverview;
 		composite_1.layout(true);

@@ -7,6 +7,7 @@ import model.overview.Port;
 
 public class PortToTable {
 
+	// This returns a table representation of a list of ports on a switch
 	public static String[][] getPortTableFormat(List<Port> ports) {
 		
 		if(ports != null){

@@ -19,6 +19,7 @@ public class FlowJSON {
 	static JSONObject obj;
 	static JSONArray json;
 
+	// This parses JSON from the restAPI to get all the flows from a specified switch, meant for the controller overview
 	public static List<Flow> getFlows(String sw) throws IOException,
 			JSONException {
 

@@ -19,6 +19,7 @@ public class StaticFlowManagerJSON {
 	static JSONObject jsonobj, obj;
 	static JSONArray json;
 
+	// This parses JSON from the restAPI to get all the flows from a switch
 	public static List<Flow> getFlows(String sw) throws IOException,
 			JSONException {
 		
@@ -42,7 +43,9 @@ public class StaticFlowManagerJSON {
 						Flow flow = new Flow();
 						flow.setSwitch(sw);
 						flow.setName(key);
+						// Get the actions
 						flow.setActions(ActionManagerJSON.getActions(sw, key));
+						// Get the match
 						flow.setMatch(MatchManagerJSON.getMatch(sw, key));
 						if (obj.getInt("priority") != 32767)
 							flow.setPriority(String.valueOf(obj

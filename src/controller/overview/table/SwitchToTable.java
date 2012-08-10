@@ -7,6 +7,7 @@ import model.overview.Switch;
 
 public class SwitchToTable {
 
+	// This returns a table representation of a switch from a list of switches
 	public static String[][] getSwitchTableFormat(List<Switch> switches) {
 		
 		if(switches != null){

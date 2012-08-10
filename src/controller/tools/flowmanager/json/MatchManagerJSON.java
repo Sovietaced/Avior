@@ -23,6 +23,7 @@ public class MatchManagerJSON {
 	static JSONObject obj;
 	static JSONArray json;
 
+	// This parses JSON from the restAPI to get the match of a flow and all it's values
 	public static Match getMatch(String dpid, String flowName)
 			throws JSONException, IOException {
 		Match match = new Match();
@@ -32,7 +33,7 @@ public class MatchManagerJSON {
 		obj = obj.getJSONObject(dpid).getJSONObject(flowName)
 				.getJSONObject("match");
 
-		// Here we check the values, if they are default we set them to null.
+		// Here we check the values, if they are default we set them to emptry strings.
 		// This way they don't confuse the user into thinking they set something
 		// they didn't
 		if (!obj.getString("dataLayerDestination").equals("00:00:00:00:00:00"))

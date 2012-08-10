@@ -44,6 +44,7 @@ public class ActionToTable {
 		}
 	}
 
+	// Creates a blank new actions and formats it so it can be displayed in a table
 	public static String[][] getNewActionTableFormat(String actionType) {
 
 		Action action = new Action(actionType);
@@ -65,6 +66,8 @@ public class ActionToTable {
 		}
 	}
 
+	// Checks the values for valid entries, also checks if port entries are
+	// valid
 	public static boolean errorChecksPassed(Switch sw, String currAction,
 			TableItem[] items) {
 

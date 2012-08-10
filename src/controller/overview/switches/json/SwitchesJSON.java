@@ -21,6 +21,7 @@ public class SwitchesJSON {
 	static String IP = Gui.IP;
 	static JSONObject obj;
 
+	// This parses JSON from the restAPI to get all the switches connected to the controller
 	public static List<Switch> getSwitches() throws JSONException {
 
 		// Create empty lists for all our data
@@ -104,7 +105,6 @@ public class SwitchesJSON {
 				
 				for(int i = 0; i < json.length(); i++){
 					// Here we get json info using the port option
-					
 					obj = (JSONObject) json.get(i);
 					Port port = new Port(String.valueOf(obj.getInt("portNumber")));
 					port.setReceivePackets(String.valueOf(obj.getLong("receivePackets")));
@@ -146,6 +146,7 @@ public class SwitchesJSON {
 		return switches;
 		}
 	
+	// This parses JSON from the restAPI to get a specified switch by it's DPID, mainly used in scenarios to save computing time
 	public static Switch getSwitch(String Dpid) throws JSONException {
 
 		Switch sw = new Switch(Dpid);

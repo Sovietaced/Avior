@@ -7,6 +7,7 @@ import model.tools.flowmanager.Flow;
 
 public class FlowToTable {
 
+	// This returns a table representation of a flow, formatted for the controller overview
 	public static String[][] getFlowTableFormat(List<Flow> flows) {
 
 		if (flows != null) {
