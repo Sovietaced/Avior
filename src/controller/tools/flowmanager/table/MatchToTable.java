@@ -60,6 +60,7 @@ public class MatchToTable {
 public static boolean errorChecksPassed(Switch sw, TableItem[] items){
 	
 				List<Port> ports = sw.getPorts();
+				boolean checkPorts = false;
 			
 				if(!items[0].getText(1).isEmpty() && !ErrorCheck.isMac(items[0].getText(1))){
 					MatchManager.displayError("Data Layer Destination must be a valid MAC address.");
@@ -80,6 +81,9 @@ public static boolean errorChecksPassed(Switch sw, TableItem[] items){
 				if(!items[5].getText(1).isEmpty() && !ErrorCheck.isNumeric(items[5].getText(1))){
 					MatchManager.displayError("Input Port must be a valid number.");
 					return false;
+				}
+				else if(!items[5].getText(1).isEmpty() && ErrorCheck.isNumeric(items[5].getText(1))){
+					checkPorts = true;
 				}
 				
 				if(!items[6].getText(1).isEmpty() && !ErrorCheck.isIP(items[6].getText(1))){
@@ -110,13 +114,17 @@ public static boolean errorChecksPassed(Switch sw, TableItem[] items){
 					MatchManager.displayError("Wildcards must be a valid number.");
 					return false;
 				}
-				for(Port port : ports){
-					if(items[5].getText(1).equals(port.getPortNumber())){
-						return true;
+				
+				if(checkPorts){
+					for(Port port : ports){
+						if(items[5].getText(1).equals(port.getPortNumber())){
+							return true;
+						}
 					}
-				}
 				
 				MatchManager.displayError("That port does not exist on the switch!");
 				return false;
+				}
+				return true;
 		}
 }
