@@ -40,7 +40,7 @@ public class MatchJSON {
 		if (obj.getInt("dataLayerVirtualLanPriorityCodePoint") != 0)
 			match.setDataLayerPCP(String.valueOf(obj
 					.getInt("dataLayerVirtualLanPriorityCodePoint")));
-		if (obj.getInt("inputPort") != 0)
+		if (obj.getInt("inputPort") != 0 || obj.getInt("inputPort") != 1)
 			match.setInputPort(String.valueOf(obj.getInt("inputPort")));
 		if (!obj.getString("networkDestination").equals("0.0.0.0"))
 			match.setNetworkDestination(obj.getString("networkDestination"));
