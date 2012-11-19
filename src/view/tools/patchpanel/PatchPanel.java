@@ -145,14 +145,10 @@ public class PatchPanel {
 								.getName());
 					}
 				}
-				else {
-					new TreeItem(tree_patches, SWT.NONE).setText("None Set");
-				}
 			}
 		}
-		else {
+		if(patches.isEmpty())
 			new TreeItem(tree_patches, SWT.NONE).setText("None Set");
-		}
 	}
 
 	private void populatePortTables(int index) {
