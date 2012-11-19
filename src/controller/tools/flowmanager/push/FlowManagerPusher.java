@@ -121,14 +121,6 @@ public class FlowManagerPusher {
 			flow.setName(items[0].getText(1));
 		if (!items[3].getText(1).isEmpty())
 			flow.setPriority(items[3].getText(1));
-		if (!items[4].getText(1).isEmpty())
-			flow.setCookie(items[4].getText(1));
-		if (!items[5].getText(1).isEmpty())
-			flow.setIdleTimeOut(items[5].getText(1));
-		if (!items[6].getText(1).isEmpty())
-			flow.setHardTimeOut(items[6].getText(1));
-		if (!items[7].getText(1).isEmpty())
-			flow.setOutPort(items[7].getText(1));
 		return flow;
 	}
 }

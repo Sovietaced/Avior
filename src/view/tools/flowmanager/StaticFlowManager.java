@@ -161,6 +161,8 @@ public class StaticFlowManager {
 		switches = Gui.getSwitches();
 
 		if (!switches.isEmpty()) {
+			currSwitch = switches.get(0);
+			
 			for (Switch sw : switches) {
 				new TreeItem(tree_switches, SWT.NONE).setText(sw.getDpid());
 			}
