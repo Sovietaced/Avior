@@ -169,6 +169,7 @@ public class StaticFlowManager {
 
 	private void populateFlowTree(int index) {
 
+		disposeEditor();
 		tree_flows.removeAll();
 		table_flow.removeAll();
 		currSwitch = switches.get(index);

@@ -26,7 +26,7 @@ public class FlowToTable {
 				if (flow.getIdleTimeOut() != null) {
 					stringList.add(flow.getIdleTimeOut());
 				} else {
-					stringList.add("Never");
+					stringList.add("Static");
 				}
 				arrData[count] = stringList.toArray(new String[stringList
 						.size()]);
