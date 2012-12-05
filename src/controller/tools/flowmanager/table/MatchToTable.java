@@ -1,7 +1,7 @@
 package controller.tools.flowmanager.table;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.widgets.TableItem;
 
@@ -55,7 +55,7 @@ public class MatchToTable {
 	// valid
 	public static boolean errorChecksPassed(Switch sw, TableItem[] items) {
 
-		List<Port> ports = sw.getPorts();
+		Map<Integer, Port> ports = sw.getPorts();
 		boolean checkPorts = false;
 
 		if (!items[0].getText(1).isEmpty()
@@ -133,15 +133,13 @@ public class MatchToTable {
 		}
 
 		if (checkPorts) {
-			for (Port port : ports) {
-				if (items[5].getText(1).equals(port.getPortNumber())) {
-					return true;
-				}
+			if (ports.keySet().contains(new Integer(items[5].getText(1)))){
+				return true;
 			}
-
-			MatchManager
-					.displayError("That port does not exist on the switch!");
-			return false;
+			else{
+				MatchManager.displayError("That port does not exist on the switch!");
+				return false;
+			}
 		}
 		return true;
 	}

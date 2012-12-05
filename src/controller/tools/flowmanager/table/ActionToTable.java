@@ -1,6 +1,7 @@
 package controller.tools.flowmanager.table;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.widgets.TableItem;
 
@@ -70,7 +71,7 @@ public class ActionToTable {
 	public static boolean errorChecksPassed(Switch sw, String currAction,
 			TableItem[] items) {
 
-		List<Port> ports = sw.getPorts();
+		Map<Integer, Port> ports = sw.getPorts();
 		boolean checkPorts = false;
 
 		if (currAction.equals("output") || currAction.equals("set-vlan-id")
@@ -111,16 +112,14 @@ public class ActionToTable {
 			}
 		}
 
-		if (checkPorts) {
-			for (Port port : ports) {
-				if (items[0].getText(1).equals(port.getPortNumber())) {
-					return true;
-				}
+		if (checkPorts) {	
+			if (ports.keySet().contains(new Integer(items[0].getText(1)))){
+				return true;
 			}
-
-			ActionManager
-					.displayError("That port does not exist on the switch!");
-			return false;
+			else{
+				ActionManager.displayError("That port does not exist on the switch!");
+				return false;
+			}
 		}
 
 		return true;

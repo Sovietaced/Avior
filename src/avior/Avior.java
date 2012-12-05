@@ -10,6 +10,5 @@ public class Avior {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 }

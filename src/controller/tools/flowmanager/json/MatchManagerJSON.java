@@ -1,6 +1,10 @@
 package controller.tools.flowmanager.json;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Match;
 
@@ -22,14 +26,27 @@ public class MatchManagerJSON {
 	private static String IP = Gui.IP;
 	static JSONObject obj;
 	static JSONArray json;
+	static Future<Object> future;
 
 	// This parses JSON from the restAPI to get the match of a flow and all it's values
 	public static Match getMatch(String dpid, String flowName)
 			throws JSONException, IOException {
 		Match match = new Match();
 		// Get the match object
-		obj = Deserializer.readJsonObjectFromURL("http://" + IP
+		future = Deserializer.readJsonObjectFromURL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/list/" + dpid + "/json");
+		try {
+			obj = (JSONObject) future.get(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		obj = obj.getJSONObject(dpid).getJSONObject(flowName)
 				.getJSONObject("match");
 

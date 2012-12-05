@@ -6,6 +6,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Action;
 
@@ -21,6 +25,7 @@ public class ActionManagerJSON {
 	static String IP = Gui.IP;
 	static JSONObject obj;
 	static JSONArray json;
+	static Future<Object> future;
 
 	// This parses JSON from the restAPI to get all the actions and values for that action by it's flow name
 	public static List<Action> getActions(String dpid, String flowName)
@@ -28,8 +33,20 @@ public class ActionManagerJSON {
 
 		List<Action> actions = new ArrayList<Action>();
 		// Get the array of actions
-		obj = Deserializer.readJsonObjectFromURL("http://" + IP
+		future = Deserializer.readJsonObjectFromURL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/list/" + dpid + "/json");
+		try {
+			obj = (JSONObject) future.get(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TimeoutException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (!obj.getJSONObject(dpid).getJSONObject(flowName).isNull("actions")) {
 			json = obj.getJSONObject(dpid).getJSONObject(flowName)
 					.getJSONArray("actions");

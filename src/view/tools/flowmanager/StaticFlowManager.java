@@ -33,6 +33,7 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Button;
 
+import controller.overview.switches.json.SwitchesJSON;
 import controller.tools.flowmanager.json.StaticFlowManagerJSON;
 import controller.tools.flowmanager.push.FlowManagerPusher;
 import controller.tools.flowmanager.table.FlowToTable;
@@ -157,7 +158,11 @@ public class StaticFlowManager {
 		tree_flows.removeAll();
 		tree_switches.removeAll();
 		flow = null;
-
+		
+		if(Gui.switchesLoaded == false){
+			Gui.loadSwitches();
+		}
+		
 		switches = Gui.getSwitches();
 
 		if (!switches.isEmpty()) {

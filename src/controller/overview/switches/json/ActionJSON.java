@@ -21,7 +21,7 @@ public class ActionJSON {
 	static JSONObject obj;
 	static JSONArray json;
 
-	// This parses JSON from the restAPI to get all the actions from a JSON array, meant for the controller overview
+	// This parses JSON from the restAPI to get all the actions from a JSON array, meant for the switch overview
 	public static List<Action> getActions(JSONArray json)
 			throws JSONException, IOException {
 

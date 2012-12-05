@@ -55,7 +55,8 @@ public class FlowManagerPusher {
 		
 		// Make sure the static flow pusher throws no errors
 		if (json.getString("status").equals("Entry pushed") || json.getString("status").equals(warning)) {
-			List<Flow> actualFlows = FlowJSON.getFlows(flow.getSwitch());
+			// Get actual flows, we pass null as first parameter to denote that we are not supplying a JSON object
+			List<Flow> actualFlows = FlowJSON.getFlows(null,flow.getSwitch());
 			// Compare the flow you just pushed with those actually on the switch
 			// If found, success message printed.
 			for (Flow actualFlow : actualFlows) {

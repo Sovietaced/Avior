@@ -1,5 +1,6 @@
 package view;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class Gui {
 	protected TreeItem trtmSwitches, trtmDevices;
 	protected Switch currSwitch;
 	protected boolean dispose;
+	public static boolean switchesLoaded;
 	protected Display display;
 	public static String IP;
 	static List<Switch> switches = new ArrayList<Switch>();
@@ -90,6 +92,18 @@ public class Gui {
 	public static List<Switch> getSwitches() {
 		return switches;
 	}
+	
+	public static void loadSwitches() {
+		try {
+			switches = SwitchesJSON.getSwitches();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	// This will continue to update the live screen showing the switch data
 	private void liveUpdate(final Switch sw) {
@@ -116,6 +130,8 @@ public class Gui {
 		try {
 			controllerInfo = ControllerJSON.getControllerInfo();
 		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		// Check to see that all the controller information is here
@@ -150,6 +166,9 @@ public class Gui {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -172,6 +191,9 @@ public class Gui {
 
 	// This gets information about all the switches.
 	private void loadSwitchesData() {
+		
+		if(switchesLoaded == false)
+			switchesLoaded = true;
 		// Get the most recent data about the switches
 		updateSwitchesData();
 		
@@ -184,7 +206,7 @@ public class Gui {
 
 	// This specifically loads information about a switch's ports. This allows
 	// for a faster response in the GUI
-	private void loadSwitchData(Switch sw) {
+	private void loadSwitchData(Switch sw){
 		// Clear the tables of any old information
 		table_ports.removeAll();
 		// Clear the tables of any old information
@@ -193,12 +215,13 @@ public class Gui {
 		currSwitch = sw;
 
 		// Try to get the up to date information about this switch
-		try {
-			sw = SwitchesJSON.getSwitch(sw.getDpid());
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			try {
+				SwitchesJSON.updateSwitch(sw);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 
 			for (String[] data : FlowToTable.getFlowTableFormat(sw.getFlows())) {
 				new TableItem(table_flows, SWT.NONE).setText(data);
@@ -223,7 +246,7 @@ public class Gui {
 
 		shell = new Shell();
 		shell.setSize(1200, 800);
-		shell.setText("Floodlight Control Panel");
+		shell.setText("Avior");
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -353,7 +376,7 @@ public class Gui {
 
 		Label lblM = new Label(composite_2, SWT.NONE);
 		lblM.setBounds(10, 10, 107, 17);
-		lblM.setText("Avior v1.2");
+		lblM.setText("Avior v1.3");
 
 		TreeItem trtmTest = new TreeItem(tree, SWT.NONE);
 		trtmTest.setText("Overview");
@@ -609,9 +632,8 @@ public class Gui {
 			new StaticFlowManager(switches.indexOf(currSwitch));
 		}
 	});
-
-		loadSwitchesTree();
-
+		
+		switchesLoaded = false;
 		stackLayout.topControl = controllerOverview;
 		composite_1.layout(true);
 

@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Flow;
 
@@ -18,6 +22,7 @@ public class StaticFlowManagerJSON {
 	static String IP = Gui.IP;
 	static JSONObject jsonobj, obj;
 	static JSONArray json;
+	static Future<Object> future;
 
 	// This parses JSON from the restAPI to get all the flows from a switch
 	public static List<Flow> getFlows(String sw) throws IOException,
@@ -26,8 +31,20 @@ public class StaticFlowManagerJSON {
 		List<Flow> flows = new ArrayList<Flow>();
 		
 		// Get the string names of all the specified switch's flows
-		jsonobj = Deserializer.readJsonObjectFromURL("http://" + IP
+		future = Deserializer.readJsonObjectFromURL("http://" + IP
 				+ ":8080/wm/staticflowentrypusher/list/" + sw + "/json");
+		try {
+			jsonobj = (JSONObject) future.get(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TimeoutException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		if (!jsonobj.isNull(sw)){
 			jsonobj = jsonobj.getJSONObject(sw);

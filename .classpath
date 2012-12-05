@@ -4,6 +4,6 @@
 	<classpathentry kind="src" path="lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/swt-grouplayout.jar"/>
-	<classpathentry kind="lib" path="lib/swt-4.2.1-cocoa-macosx-x86_64.zip"/>
+	<classpathentry kind="lib" path="lib/swt_linux_64.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

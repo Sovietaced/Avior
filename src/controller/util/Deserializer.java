@@ -7,11 +7,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.concurrent.Callable;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class Deserializer {
 
-	public static InputStream is;
+	private final static int THREADS = Runtime.getRuntime().availableProcessors();
+    public static ExecutorService executor = Executors.newFixedThreadPool(THREADS);
+
 
 	private static String readAll(Reader rd) throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -21,32 +28,54 @@ public class Deserializer {
 		}
 		return sb.toString();
 	}
-
-	public static JSONArray readJsonArrayFromURL(String url)
-			throws IOException, JSONException {
-		is = new URL(url).openStream();
-		try {
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is,
-					Charset.forName("UTF-8")));
-			String jsonText = readAll(rd);
-			JSONArray jsonArr = new JSONArray(jsonText);
-			return jsonArr;
-		} finally {
-			is.close();
-		}
+	
+	public static Future<Object> readJsonArrayFromURL(final String url){
+		 final Future<Object> future = executor.submit(new Callable<Object>(){
+           public Object call() {
+       		try {
+       			InputStream is = new URL(url).openStream();
+       			BufferedReader rd = new BufferedReader(new InputStreamReader(is,
+       					Charset.forName("UTF-8")));
+       			String jsonText = readAll(rd);
+       			is.close();
+       			return new JSONArray(jsonText);
+       		} catch (JSONException e) {
+					System.out.println("Failed to deserialize data" +
+							" : readJsonObjectFromURL");
+					e.printStackTrace();
+				} catch (IOException e) {
+					System.out.println("Failed to deserialize data" +
+							" : readJsonObjectFromURL");
+					e.printStackTrace();
+				}
+       		return null;
+           }
+       });
+		return future;
 	}
-
-	public static JSONObject readJsonObjectFromURL(String url)
-			throws IOException, JSONException {
-		is = new URL(url).openStream();
-		try {
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is,
-					Charset.forName("UTF-8")));
-			String jsonText = readAll(rd);
-			JSONObject jsonObj = new JSONObject(jsonText);
-			return jsonObj;
-		} finally {
-			is.close();
-		}
+	
+	public static Future<Object> readJsonObjectFromURL(final String url){
+		 final Future<Object> future = executor.submit(new Callable<Object>(){
+            public Object call() {
+        		try {
+        			InputStream is = new URL(url).openStream();
+        			BufferedReader rd = new BufferedReader(new InputStreamReader(is,
+        					Charset.forName("UTF-8")));
+        			String jsonText = readAll(rd);
+        			is.close();
+        			return new JSONObject(jsonText);
+        		} catch (JSONException e) {
+					System.out.println("Failed to deserialize data" +
+							" : readJsonObjectFromURL");
+					e.printStackTrace();
+				} catch (IOException e) {
+					System.out.println("Failed to deserialize data" +
+							" : readJsonObjectFromURL");
+					e.printStackTrace();
+				}
+        		return null;
+            }
+        });
+		return future;
 	}
 }

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.8.2
+Created-By: 1.6.0_21-b06 (Sun Microsystems Inc.)
+SWT-OS: macosx
+SWT-WS: cocoa
+SWT-Arch: 
+

@@ -2,6 +2,9 @@ package model.overview;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 import model.tools.flowmanager.Flow;
@@ -9,7 +12,7 @@ import model.tools.flowmanager.Flow;
 public class Switch {
 	
 	String manufacturerDescription, hardwareDescription, softwareDescription, serialNumber, datapathDescription, dpid, packetCount, byteCount, flowCount;
-	List <Port> ports = new ArrayList<Port>();
+	SortedMap<Integer, Port> ports = new TreeMap<Integer, Port>();
 	List <Flow> flows= new ArrayList<Flow>();
 	
 	public Switch(String dpid){
@@ -77,10 +80,10 @@ public class Switch {
 	public void setDatapathDescription(String datapathDescription) {
 		this.datapathDescription = datapathDescription;
 	}
-	public List<Port> getPorts() {
+	public Map<Integer, Port> getPorts() {
 		return ports;
 	}
-	public void setPorts(List<Port> ports) {
+	public void setPorts(SortedMap<Integer, Port> ports) {
 		this.ports = ports;
 	}
 	public List<Flow> getFlows(){

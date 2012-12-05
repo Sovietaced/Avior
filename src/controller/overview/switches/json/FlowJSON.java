@@ -3,6 +3,10 @@ package controller.overview.switches.json;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Flow;
 
@@ -18,22 +22,36 @@ public class FlowJSON {
 	static String IP = Gui.IP;
 	static JSONObject obj;
 	static JSONArray json;
+	static Future<Object> future;
 
 	// This parses JSON from the restAPI to get all the flows from a specified switch, meant for the controller overview
-	public static List<Flow> getFlows(String sw) throws IOException,
+	public static List<Flow> getFlows(JSONObject obj, String dpid) throws IOException,
 			JSONException {
 
 		List<Flow> flows = new ArrayList<Flow>();
-
-		// Get the string names of all the specified switch's flows
-		obj = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/core/switch/" + sw + "/flow/json");
-
-		if (!obj.isNull(sw)) {
-			json = obj.getJSONArray(sw);
+		
+		// If JSONObject is not supplied, get it.
+		if(obj == null){
+			try {
+				obj = (JSONObject) Deserializer.readJsonObjectFromURL("http://" + IP
+						+ ":8080/wm/core/switch/" + dpid + "/flow/json").get(5, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TimeoutException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (!obj.isNull(dpid)) {
+			json = obj.getJSONArray(dpid);
 			for (int i = 0; i < json.length(); i++) {
 				obj = (JSONObject) json.get(i);
-				Flow flow = new Flow(sw);
+				Flow flow = new Flow(dpid);
 				flow.setActions(ActionJSON.getActions(obj
 						.getJSONArray("actions")));
 				flow.setMatch(MatchJSON.getMatch(obj.getJSONObject("match")));

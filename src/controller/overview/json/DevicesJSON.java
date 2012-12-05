@@ -1,9 +1,12 @@
 package controller.overview.json;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import controller.util.Deserializer;
 import controller.util.JSONArray;
@@ -26,8 +29,9 @@ public class DevicesJSON {
 		// Get the string IDs of all the switches and create switch summary
 		// objects for each one
 		try {
-			JSONArray json = Deserializer.readJsonArrayFromURL("http://" + IP
+			Future<Object> devices = Deserializer.readJsonArrayFromURL("http://" + IP
 					+ ":8080/wm/device/");
+			JSONArray json = (JSONArray) devices.get(5, TimeUnit.SECONDS);
 			for (int i = 0; i < json.length(); i++) {
 				obj = json.getJSONObject(i);
 				DeviceSummary temp = new DeviceSummary(obj.getJSONArray("mac")
@@ -44,8 +48,15 @@ public class DevicesJSON {
 				temp.setLastSeen(d);
 				deviceSummaries.add(temp);
 			}
-		} catch (IOException e) {
-			System.out.println("Fail sauce!");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return deviceSummaries;
 	}

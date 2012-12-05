@@ -87,6 +87,10 @@ public class PatchPanel {
 		tree_patches.removeAll();
 		tree_switches.removeAll();
 
+		if(Gui.switchesLoaded == false){
+			Gui.loadSwitches();
+		}
+		
 		switches = Gui.getSwitches();
 
 		if (!switches.isEmpty()) {
@@ -160,7 +164,7 @@ public class PatchPanel {
 		Switch sw = Gui.getSwitches().get(index);
 
 		if (sw != null) {
-			for (Port p : sw.getPorts()) {
+			for (Port p : sw.getPorts().values()) {
 				String[] portData = { p.getPortNumber(), p.getStatus() };
 				new TableItem(table_ports1, SWT.NONE).setText(portData);
 				new TableItem(table_ports2, SWT.NONE).setText(portData);
