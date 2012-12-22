@@ -124,8 +124,10 @@ public class About {
 			Image marist = new Image(display, ideaImage);
 			Label lblNewLabel_2 = new Label(shell, SWT.NONE);
 			lblNewLabel_2.setImage(marist);
-			lblNewLabel_2.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
-					false, false, 1, 1));
+			GridData gd_lblNewLabel_2 = new GridData(SWT.CENTER, SWT.CENTER,
+					false, false, 1, 1);
+			gd_lblNewLabel_2.widthHint = 310;
+			lblNewLabel_2.setLayoutData(gd_lblNewLabel_2);
 		} catch (Exception j) {
 			System.out.println("Failed to display image");
 		}

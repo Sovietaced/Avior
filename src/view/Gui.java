@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 
 import view.tools.flowmanager.StaticFlowManager;
-import view.tools.patchpanel.PatchPanel;
+import view.tools.firewall.Firewall;
 
 import controller.overview.json.ControllerJSON;
 import controller.overview.switches.json.SwitchesJSON;
@@ -352,8 +352,8 @@ public class Gui {
 					}
 					
 					// Handler for Flow Manager tree item
-					else if (selection[0].getText().equals("Patch Panel")) {
-						new PatchPanel();
+					else if (selection[0].getText().equals("Firewall")) {
+						new Firewall();
 					}
 
 					// Handler for Firewall tree item
@@ -397,8 +397,18 @@ public class Gui {
 		TreeItem trtmFlowManager = new TreeItem(trtmTools, SWT.NONE);
 		trtmFlowManager.setText("Flow Manager");
 		
-		TreeItem trtmPatchPanel = new TreeItem(trtmTools, SWT.NONE);
-		trtmPatchPanel.setText("Patch Panel");
+		TreeItem trtmFirewall = new TreeItem(trtmTools, SWT.NONE);
+		trtmFirewall.setText("Firewall");
+		
+		TreeItem trtmQos = new TreeItem(trtmTools, SWT.NONE);
+		trtmQos.setText("QoS");
+		
+		TreeItem trtmVirtualnetworkfilter = new TreeItem(trtmTools, SWT.NONE);
+		trtmVirtualnetworkfilter.setText("VirtualNetworkFilter");
+		
+		TreeItem trtmLoadbalancer = new TreeItem(trtmTools, SWT.NONE);
+		trtmLoadbalancer.setText("LoadBalancer");
+		trtmTools.setExpanded(true);
 
 		switches_table = new Table(composite_1, SWT.BORDER | SWT.FULL_SELECTION);
 		switches_table.setHeaderVisible(true);

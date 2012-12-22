@@ -1,13 +1,12 @@
-package view.tools.flowmanager;
+package view.tools.firewall;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import model.overview.Switch;
-import model.tools.flowmanager.Action;
+import model.tools.firewall.Rule;
 import model.tools.flowmanager.Flow;
-import model.tools.flowmanager.Match;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
@@ -33,25 +32,24 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Button;
 
-import controller.tools.flowmanager.json.StaticFlowManagerJSON;
+import controller.tools.firewall.json.RuleJSON;
 import controller.tools.flowmanager.push.FlowManagerPusher;
 import controller.tools.flowmanager.table.FlowToTable;
 import controller.util.JSONException;
 
 import view.About;
-import view.Gui;
 
-public class StaticFlowManager {
+public class Firewall {
 
 	protected static Shell shell;
-	public Tree tree_switches, tree_flows;
+	public Tree tree_rules;
 	protected Table table_flow;
 	protected TableEditor editor;
 	final int EDITABLECOLUMN = 1;
 	public static Switch currSwitch;
-	public static Flow flow;
+	public static Rule rule;
 	protected List<Switch> switches = new ArrayList<Switch>();
-	protected List<Flow> flows = new ArrayList<Flow>();
+	protected List<Rule> rules = new ArrayList<Rule>();
 	protected static boolean unsavedProgress;
 
 	/**
@@ -60,31 +58,13 @@ public class StaticFlowManager {
 	 * @param args
 	 */
 
-	public StaticFlowManager() {
+	public Firewall() {
 		open();
-	}
-
-	public StaticFlowManager(int index) {
-		open(index);
 	}
 
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
-		shell.open();
-		shell.layout();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
-	// This is a second open method for pre-selecting a switch
-	public void open(int index) {
-		Display display = Display.getDefault();
-		createContents();
-		populateFlowTree(index);
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed()) {
@@ -117,31 +97,14 @@ public class StaticFlowManager {
 		mb.open();
 	}
 	
-	public static Flow getFlow() {
-		return flow;
+	public static Rule getRule() {
+		return rule;
 	}
 
-	public static void setFlow(Flow f) {
-		flow = f;
+	public static void setRule(Rule r) {
+		rule = r;
 	}
 
-	public static List<Action> getActions() {
-		return flow.getActions();
-	}
-
-	public static void setActions(List<Action> acts) {
-		unsavedProgress = true;
-		flow.setActions(acts);
-	}
-
-	public static Match getMatch() {
-		return flow.getMatch();
-	}
-
-	public static void setMatch(Match m) {
-		unsavedProgress = true;
-		flow.setMatch(m);
-	}
 
 	public static Switch getCurrSwitch() {
 		return currSwitch;
@@ -151,41 +114,16 @@ public class StaticFlowManager {
 		currSwitch = sw;
 	}
 
-	private void populateSwitchTree() {
+
+	private void populateRuleTree() {
 
 		// Clear the trees of any old data
-		tree_flows.removeAll();
-		tree_switches.removeAll();
-		flow = null;
+		tree_rules.removeAll();
+		rule = null;
 		
-		if(Gui.switchesLoaded == false){
-			Gui.loadSwitches();
-		}
-		
-		switches = Gui.getSwitches();
-
-		if (!switches.isEmpty()) {
-			currSwitch = switches.get(0);
-			
-			for (Switch sw : switches) {
-				new TreeItem(tree_switches, SWT.NONE).setText(sw.getDpid());
-			}
-		}
-	}
-
-	private void populateFlowTree(int index) {
-
-		disposeEditor();
-		tree_flows.removeAll();
-		table_flow.removeAll();
-		currSwitch = switches.get(index);
-		flow = null;
-		// This just makes sure the selection is noted in the event of
-		// pre-selection
-		tree_switches.select(tree_switches.getItem(index));
 		try {
 			// Here we get the static flows only
-			flows = StaticFlowManagerJSON.getFlows(currSwitch.getDpid());
+			rules = RuleJSON.getRules();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -193,24 +131,17 @@ public class StaticFlowManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// Fill the tree with the flows
-		if (!flows.isEmpty()) {
-			for (Flow flow : flows) {
-				if (flow.getName() != null)
-					new TreeItem(tree_flows, SWT.NONE).setText(flow.getName());
-			}
-		} else {
-			new TreeItem(tree_flows, SWT.NONE).setText("No Static Flows Set");
+		
+		for (Rule r : rules) {
+			new TreeItem(tree_rules, SWT.NONE).setText(String.valueOf(r.getRuleid()));
 		}
 	}
 
-	private void populateFlowTable(Flow f) {
+	private void populateRuleTable(Rule r) {
 
 		table_flow.removeAll();
-		flow = f;
 
-			for (String[] row : FlowToTable.getFlowTableFormat(f)) {
+			for (String[] row : FlowToTable.getFlowTableFormat(r)) {
 				new TableItem(table_flow, SWT.NONE).setText(row);
 		}
 	}
@@ -218,7 +149,6 @@ public class StaticFlowManager {
 	// This method creates a new flow with default values.
 	public void setupNewFlow() {
 
-		flow = new Flow(currSwitch.getDpid());
 		table_flow.removeAll();
 
 			for (String[] row : FlowToTable.getNewFlowTableFormat()) {
@@ -232,7 +162,7 @@ public class StaticFlowManager {
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(1200, 800);
-		shell.setText("Floodlight Static Flow Manager");
+		shell.setText("Floodlight Firewall Manager");
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -309,12 +239,6 @@ public class StaticFlowManager {
 			public void widgetSelected(SelectionEvent e) {
 				String selection = table_flow.getSelection()[0].getText();
 				
-				if (selection.equals("Actions")) {
-					new ActionManager();
-				} else if (selection.equals(
-						"Match")) {
-					new MatchManager();
-				}
 			}
 		});
 
@@ -366,50 +290,22 @@ public class StaticFlowManager {
 		Composite composite_2 = new Composite(composite, SWT.NONE);
 		composite_2.setBounds(10, 0, 194, 742);
 
-		tree_switches = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS
+		tree_rules = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS
 				| SWT.NONE);
-		tree_switches.setBounds(0, 33, 185, 268);
-		tree_switches.addSelectionListener(new SelectionAdapter() {
+		tree_rules.setBounds(0, 33, 185, 699);
+		tree_rules.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				TreeItem[] switch_selection = tree_switches.getSelection();
+				TreeItem[] switch_selection = tree_rules.getSelection();
 				if (switch_selection.length != 0) {
-					populateFlowTree(tree_switches
-							.indexOf(switch_selection[0]));
-				}
-			}
-		});
-
-		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS | SWT.NONE);
-		tree_flows.setBounds(0, 330, 185, 412);
-		tree_flows.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				TreeItem[] selection_switches = tree_switches.getSelection();
-				TreeItem[] selection_flows = tree_flows.getSelection();
-
-				if (selection_switches.length != 0
-						&& selection_flows.length != 0) {
-					if (!selection_flows[0].getText().equals(
-							"No Static Flows Set")) {
-						for (Flow flow : flows) {
-							if (flow.getName().equals(
-									selection_flows[0].getText())) {
-								populateFlowTable(flow);
-							}
-						}
-					}
+				
 				}
 			}
 		});
 
 		Label lblSwitches = new Label(composite_2, SWT.NONE);
 		lblSwitches.setBounds(0, 10, 70, 17);
-		lblSwitches.setText("Switches");
-
-		Label lblFlows = new Label(composite_2, SWT.NONE);
-		lblFlows.setBounds(0, 307, 70, 17);
-		lblFlows.setText("Flows");
+		lblSwitches.setText("Rules");
 
 		Composite composite_3 = new Composite(composite, SWT.NONE);
 		composite_3.setBounds(210, 0, 978, 35);
@@ -421,13 +317,13 @@ public class StaticFlowManager {
 		btnRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				populateSwitchTree();
+				//populateSwitchTree();
 			}
 		});
 
 		Button btnNewFLow = new Button(composite_3, SWT.NONE);
 		btnNewFLow.setBounds(131, 3, 125, 29);
-		btnNewFLow.setText("New Flow");
+		btnNewFLow.setText("New Rule");
 		btnNewFLow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -442,58 +338,7 @@ public class StaticFlowManager {
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					try {
-						if (flow != null) {
-							if (flow.getName() != null
-									|| !table_flow.getItems()[0].getText(1)
-											.isEmpty()) {
-
-								// Parse the changes made to the flow
-								flow = FlowManagerPusher
-										.parseTableChanges(table_flow
-												.getItems());
-
-								// Debugging
-								System.out.println(flow.serialize());
-
-								if(FlowToTable.errorChecksPassed(table_flow.getItems())){
-									
-								// Push the flow and get the response
-								String response = FlowManagerPusher.push(flow);
-
-								if (response.equals("Flow successfully pushed!")) {
-									populateFlowTree(tree_switches
-											.indexOf(tree_switches
-													.getSelection()[0]));
-									unsavedProgress = false;
-								}
-
-								disposeEditor();
-
-								// Display the response from pushing the flow
-								displayStatus(response);
-								}
-
-							} else {
-								// Error message in the event that the flow
-								// hasn't been given a name
-								displayError("Your flow must have a name");
-							}
-						}
-						// Error message in the event that the button is pushed
-						// and there is no flow to push
-						else {
-							displayError("You do not have a flow to push!");
-						}
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				
 			}
 		});
 
@@ -508,43 +353,18 @@ public class StaticFlowManager {
 
 		Button btnDeleteFlow = new Button(composite_3, SWT.NONE);
 		btnDeleteFlow.setBounds(515, 3, 125, 29);
-		btnDeleteFlow.setText("Delete Flow");
+		btnDeleteFlow.setText("Delete Rule");
 		btnDeleteFlow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (flow != null) {
-					try {
-						try {
-							String response = FlowManagerPusher.remove(flow);
-							// If successfully deleted, populate the flow tree
-							// with the new results
-							if (response.equals("Entry " + flow.getName()
-									+ " deleted"))
-								populateFlowTree(tree_switches
-										.indexOf(tree_switches.getSelection()[0]));
-
-							disposeEditor();
-
-							// Displays the response
-							displayStatus(response);
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					} catch (JSONException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				} else {
-					displayError("You must select a flow to delete!");
-				}
+				
 			}
 		});
 
 		// Delete all flows button logic
 		Button btnDeleteAllFlows = new Button(composite_3, SWT.NONE);
 		btnDeleteAllFlows.setBounds(643, 3, 125, 29);
-		btnDeleteAllFlows.setText("Delete All Flows");
+		btnDeleteAllFlows.setText("Delete All Rules");
 		btnDeleteAllFlows.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -559,8 +379,7 @@ public class StaticFlowManager {
 						// Delete all the flows for the current switch, populate
 						// the table with the new information
 						FlowManagerPusher.deleteAll(currSwitch.getDpid());
-						populateFlowTree(tree_switches.indexOf(tree_switches
-								.getSelection()[0]));
+						
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -574,7 +393,7 @@ public class StaticFlowManager {
 
 		// Populate the switch tree with the current switches on the network on
 		// construction
-		populateSwitchTree();
+		populateRuleTree();
 		shell.setLayout(gl_shell);
 	}
 }
