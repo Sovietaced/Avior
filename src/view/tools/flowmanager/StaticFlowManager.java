@@ -1,13 +1,10 @@
 package view.tools.flowmanager;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import model.overview.Switch;
 import model.tools.flowmanager.Action;
 import model.tools.flowmanager.Flow;
-import model.tools.flowmanager.Match;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
@@ -33,32 +30,40 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Button;
 
-import controller.tools.flowmanager.json.StaticFlowManagerJSON;
+import controller.floodlightprovider.FloodlightProvider;
+import controller.tools.flowmanager.push.ActionManagerPusher;
 import controller.tools.flowmanager.push.FlowManagerPusher;
-import controller.tools.flowmanager.table.FlowToTable;
+import controller.tools.flowmanager.push.MatchManagerPusher;
+import controller.tools.flowmanager.table.ActionToTable;
+import controller.tools.flowmanager.table.MatchToTable;
 import controller.util.JSONException;
 
 import view.About;
-import view.Gui;
+import view.util.DisplayMessage;
+
+import org.eclipse.swt.widgets.Combo;
 
 public class StaticFlowManager {
 
-	protected static Shell shell;
-	public Tree tree_switches, tree_flows;
-	protected Table table_flow;
-	protected TableEditor editor;
+	private static Shell shell;
+	public Tree tree_switches, tree_flows, action_tree;
+	protected TableEditor flowEditor, actionEditor, matchEditor;
 	final int EDITABLECOLUMN = 1;
-	public static Switch currSwitch;
-	public static Flow flow;
-	protected List<Switch> switches = new ArrayList<Switch>();
-	protected List<Flow> flows = new ArrayList<Flow>();
+	private static Switch currSwitch;
+	private static Flow flow;
 	protected static boolean unsavedProgress;
-
+	private Table action_table;
+	private Table match_table;
+	private Text txtFlowName;
+	private Text txtFlowPriority;
+	private static Action currAction;
+	protected String[][] matchTableFormat;
+	protected Combo combo;
+	protected int currSwitchIndex;
+	
 	/**
-	 * Launch the application.
-	 * 
-	 * @param args
-	 */
+     * @wbp.parser.constructor
+     */
 
 	public StaticFlowManager() {
 		open();
@@ -68,6 +73,10 @@ public class StaticFlowManager {
 		open(index);
 	}
 
+	public static Shell getShell(){
+	    return shell;
+	}
+	
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
@@ -94,109 +103,61 @@ public class StaticFlowManager {
 		}
 	}
 	
-	public void disposeEditor(){
+	public void disposeEditors(String editor){
 		// Dispose the editor do it doesn't leave a ghost table item
-		if (editor.getEditor() != null) {
-			editor.getEditor().dispose();
-		}
-	}
-	
-	public static void displayError(String msg){
-		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-				| SWT.OK);
-		mb.setText("Error!");
-		mb.setMessage(msg);
-		mb.open();
+		if(actionEditor.getEditor() != null && ((editor.equals("action") || editor.equals("all"))))
+		    actionEditor.getEditor().dispose();
+		if(matchEditor.getEditor() != null && ((editor.equals("match") || editor.equals("all"))))
+		    matchEditor.getEditor().dispose();
 	}
 
-	public static void displayStatus(String msg){
-		MessageBox mb = new MessageBox(shell,
-				SWT.ICON_WORKING | SWT.OK);
-		mb.setText("Status");
-		mb.setMessage(msg);
-		mb.open();
-	}
-	
-	public static Flow getFlow() {
-		return flow;
-	}
-
-	public static void setFlow(Flow f) {
-		flow = f;
-	}
-
-	public static List<Action> getActions() {
-		return flow.getActions();
-	}
-
-	public static void setActions(List<Action> acts) {
-		unsavedProgress = true;
-		flow.setActions(acts);
-	}
-
-	public static Match getMatch() {
-		return flow.getMatch();
-	}
-
-	public static void setMatch(Match m) {
-		unsavedProgress = true;
-		flow.setMatch(m);
-	}
-
-	public static Switch getCurrSwitch() {
-		return currSwitch;
-	}
-
-	public static void setCurrSwitch(Switch sw) {
-		currSwitch = sw;
-	}
-
+	/**
+	 * Populate the switch tree with DPIDs of the switches known by the controller
+	 */
 	private void populateSwitchTree() {
 
-		// Clear the trees of any old data
-		tree_flows.removeAll();
-		tree_switches.removeAll();
+	    /* Clean the slate */
+        disposeEditors("all");
+        tree_flows.removeAll();
+        tree_switches.removeAll();
+        action_tree.removeAll();
+        match_table.removeAll();
+        txtFlowName.setText("");
+        txtFlowPriority.setText("");
 		flow = null;
+		currSwitch = null;
 		
-		if(Gui.switchesLoaded == false){
-			Gui.loadSwitches();
-		}
-		
-		switches = Gui.getSwitches();
-
-		if (!switches.isEmpty()) {
-			currSwitch = switches.get(0);
-			
-			for (Switch sw : switches) {
+		// Update and check if switches exist
+		if (!FloodlightProvider.getSwitches(true).isEmpty()) {		
+			for (Switch sw : FloodlightProvider.getSwitches(false)) {
 				new TreeItem(tree_switches, SWT.NONE).setText(sw.getDpid());
 			}
+		}
+		else{
+		    new TreeItem(tree_switches, SWT.NONE).setText("No Switches");
 		}
 	}
 
 	private void populateFlowTree(int index) {
 
-		disposeEditor();
+	    /* Clean the slate */
+		disposeEditors("all");
 		tree_flows.removeAll();
-		table_flow.removeAll();
-		currSwitch = switches.get(index);
+		action_tree.removeAll();
+		match_table.removeAll();
+		txtFlowName.setText("");
+        txtFlowPriority.setText("");
+		
+        currSwitchIndex = index;
+		currSwitch = FloodlightProvider.getSwitches(false).get(currSwitchIndex);
 		flow = null;
 		// This just makes sure the selection is noted in the event of
 		// pre-selection
 		tree_switches.select(tree_switches.getItem(index));
-		try {
-			// Here we get the static flows only
-			flows = StaticFlowManagerJSON.getFlows(currSwitch.getDpid());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		// Fill the tree with the flows
-		if (!flows.isEmpty()) {
-			for (Flow flow : flows) {
+		if (!FloodlightProvider.getStaticFlows(currSwitch.getDpid(), true).isEmpty()) {
+			for (Flow flow : FloodlightProvider.getStaticFlows(currSwitch.getDpid(), false)) {
 				if (flow.getName() != null)
 					new TreeItem(tree_flows, SWT.NONE).setText(flow.getName());
 			}
@@ -205,34 +166,122 @@ public class StaticFlowManager {
 		}
 	}
 
-	private void populateFlowTable(Flow f) {
+	/**
+	 * Populates the view with the flow selected
+	 * @param index The index of the flow in the list of a switch's flows
+	 */
+	private void populateFlowView(int index) {
 
-		table_flow.removeAll();
-		flow = f;
-
-			for (String[] row : FlowToTable.getFlowTableFormat(f)) {
-				new TableItem(table_flow, SWT.NONE).setText(row);
-		}
+		flow = FloodlightProvider.getStaticFlows(currSwitch.getDpid(), false).get(index);
+        txtFlowName.setText(flow.getName());
+        if(flow.getPriority() != null)
+            txtFlowPriority.setText(flow.getPriority());
+        
+        populateActionTree();
+        populateMatchTable();
+        
 	}
 
-	// This method creates a new flow with default values.
+	/**
+	 * Generates a new flow, and updates the view accordingly
+	 */
 	public void setupNewFlow() {
 
-		flow = new Flow(currSwitch.getDpid());
-		table_flow.removeAll();
-
-			for (String[] row : FlowToTable.getNewFlowTableFormat()) {
-				new TableItem(table_flow, SWT.NONE).setText(row);
-		}
+	    if(currSwitch != null){
+    		flow = new Flow(currSwitch.getDpid());
+    		txtFlowName.setText("");
+    	    txtFlowPriority.setText("");
+    	    
+    	    populateActionTree();
+            populateMatchTable();
+	    }
+	    else{
+	        DisplayMessage.displayError(shell, "You must select a switch before creating a new flow");
+	    } 
 	}
 
+	/* ACTION METHODS */
+	
+	// This method will populate the table with a list of the current actions
+    protected void populateActionTree() {
+
+        // Set the current action to null since the table has cleared, and a new
+        // selection must be made
+        currAction = null;
+        disposeEditors("actions");
+
+        // Clear the tables of any data
+        action_table.removeAll();
+        action_tree.removeAll();
+
+        if (!flow.getActions().isEmpty()) {
+            for (Action action : flow.getActions()) {
+                new TreeItem(action_tree, SWT.NONE).setText(action.getType());
+            }
+        } else {
+            new TreeItem(action_tree, SWT.NONE).setText("None Set");
+        }
+    }
+
+    // This method will populate the table with a the selected actions
+    // parameters
+    protected void populateActionTable(int index) {
+
+        currAction = flow.getActions().get(index);
+        action_table.removeAll();
+
+        for (String[] s : ActionToTable.getActionTableFormat(currAction)) {
+            new TableItem(action_table, SWT.NO_FOCUS).setText(s);
+        }
+    }
+    
+	protected void setupAction(String actionType) {
+
+        // Set the current action to null since
+        currAction = new Action(actionType);
+
+        // Clear the tables of any data
+       action_table.removeAll();
+
+        for (String[] s : ActionToTable.getNewActionTableFormat(currAction)) {
+            new TableItem(action_table, SWT.NO_FOCUS).setText(s);
+        }
+    }
+	
+	/* MATCH METHODS */
+	
+	// This method will populate the table with a the selected actions
+    // parameters
+    protected void populateMatchTable() {
+
+        // Clear the table of any data
+        match_table.removeAll();
+        matchTableFormat = MatchToTable.getMatchTableFormat(flow.getMatch());
+
+        for (String[] s : matchTableFormat) {
+            new TableItem(match_table, SWT.NO_FOCUS).setText(s);
+        }
+    }
+
+     protected void clearValues() {
+    
+     // Clear the tables of any data
+     match_table.removeAll();
+    
+     for (String[] s : MatchToTable.getNewMatchTableFormat()) {
+         new TableItem(match_table, SWT.NO_FOCUS).setText(s);
+         }
+     }
+     
+     /* SWT */
+	
 	/**
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(1200, 800);
-		shell.setText("Floodlight Static Flow Manager");
+		shell.setSize(1194, 464);
+		shell.setText("Static Flow Manager");
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -284,91 +333,77 @@ public class StaticFlowManager {
 
 		Composite composite = new Composite(shell, SWT.NONE);
 		GroupLayout gl_shell = new GroupLayout(shell);
-		gl_shell.setHorizontalGroup(gl_shell.createParallelGroup(
-				GroupLayout.TRAILING).add(GroupLayout.LEADING, composite,
-				GroupLayout.DEFAULT_SIZE, 1198, Short.MAX_VALUE));
-		gl_shell.setVerticalGroup(gl_shell.createParallelGroup(
-				GroupLayout.LEADING).add(
-				gl_shell.createSequentialGroup()
-						.add(composite, GroupLayout.PREFERRED_SIZE, 752,
-								GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(36, Short.MAX_VALUE)));
+		gl_shell.setHorizontalGroup(
+		    gl_shell.createParallelGroup(GroupLayout.TRAILING)
+		        .add(GroupLayout.LEADING, gl_shell.createSequentialGroup()
+		            .add(composite, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		gl_shell.setVerticalGroup(
+		    gl_shell.createParallelGroup(GroupLayout.LEADING)
+		        .add(gl_shell.createSequentialGroup()
+		            .add(composite, GroupLayout.PREFERRED_SIZE, 514, GroupLayout.PREFERRED_SIZE)
+		            .addContainerGap(26, Short.MAX_VALUE))
+		);
 		composite.setLayout(null);
 
 		Composite composite_1 = new Composite(composite, SWT.NONE);
-		composite_1.setBounds(210, 42, 978, 700);
+		composite_1.setBounds(210, 42, 968, 41);
 		composite_1.setLayout(null);
-
-		table_flow = new Table(composite_1, SWT.BORDER | SWT.FULL_SELECTION
-				| SWT.NO_FOCUS);
-		table_flow.setBounds(0, 0, 978, 700);
-		table_flow.setHeaderVisible(true);
-		table_flow.setLinesVisible(true);
-		table_flow.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				String selection = table_flow.getSelection()[0].getText();
-				
-				if (selection.equals("Actions")) {
-					new ActionManager();
-				} else if (selection.equals(
-						"Match")) {
-					new MatchManager();
-				}
-			}
-		});
-
-		editor = new TableEditor(table_flow);
-		// The editor must have the same size as the cell and must
-		// not be any smaller than 50 pixels.
-		editor.horizontalAlignment = SWT.LEFT;
-		editor.grabHorizontal = true;
-		editor.minimumWidth = 50;
-
-		table_flow.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				
-				disposeEditor();
-
-				// Identify the selected row
-				TableItem item = (TableItem) e.item;
-				if (item == null)
-					return;
-
-				// The control that will be the editor must be a child of the
-				// Table
-				Text newEditor = new Text(table_flow, SWT.NONE);
-				newEditor.setText(item.getText(EDITABLECOLUMN));
-				newEditor.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(ModifyEvent me) {
-						Text text = (Text) editor.getEditor();
-						editor.getItem()
-								.setText(EDITABLECOLUMN, text.getText());
-						unsavedProgress = true;
-					}
-				});
-				newEditor.selectAll();
-				newEditor.setFocus();
-				editor.setEditor(newEditor, item, EDITABLECOLUMN);
-			}
-		});
-
-		TableColumn param = new TableColumn(table_flow, SWT.NONE);
-		param.setWidth(300);
-		param.setText("Parameter");
-
-		TableColumn value = new TableColumn(table_flow, SWT.NONE);
-		value.setWidth(300);
-		value.setText("Value");
-
+		
+		txtFlowName = new Text(composite_1, SWT.BORDER);
+		txtFlowName.setBounds(93, 10, 159, 26);
+		
+		Label lblFlowName = new Label(composite_1, SWT.NONE);
+		lblFlowName.setBounds(10, 15, 76, 21);
+		lblFlowName.setText("Flow Name :");
+		
+		Label lblFlowPriority = new Label(composite_1, SWT.NONE);
+		lblFlowPriority.setBounds(277, 13, 94, 23);
+		lblFlowPriority.setText("Flow Priority ");
+		
+		txtFlowPriority = new Text(composite_1, SWT.BORDER);
+		txtFlowPriority.setBounds(377, 10, 93, 26);
+		
+		Button btnSave_3 = new Button(composite_1, SWT.NONE);
+		btnSave_3.setBounds(761, 10, 75, 25);
+		btnSave_3.setText("Save");
+		
+		Button btnDefaultValues = new Button(composite_1, SWT.NONE);
+		btnDefaultValues.setBounds(842, 11, 110, 25);
+		btnDefaultValues.setText("Default Values");
+		btnDefaultValues.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            	if(flow != null){
+            		clearValues();
+            	}
+            	else{
+            		DisplayMessage.displayError(shell, "You must select a flow or create a new one before modifying matches!");
+            	}
+            }
+        });
+		btnSave_3.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+            	if(flow != null){
+	                if(MatchToTable.errorChecksPassed(currSwitch,match_table.getItems())){
+	                    flow.setMatch(MatchManagerPusher.addMatch(match_table
+	                        .getItems()));
+	                    unsavedProgress = true;
+	                    disposeEditors("match");
+	                }
+            	}
+            	else{
+            		DisplayMessage.displayError(shell, "You must select a flow or create a new one before modifying matches!");
+            	}
+            }
+        });
 		Composite composite_2 = new Composite(composite, SWT.NONE);
-		composite_2.setBounds(10, 0, 194, 742);
+		composite_2.setBounds(10, 0, 194, 430);
 
 		tree_switches = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS
 				| SWT.NONE);
-		tree_switches.setBounds(0, 33, 185, 268);
+		tree_switches.setBounds(0, 33, 185, 149);
 		tree_switches.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -381,23 +416,18 @@ public class StaticFlowManager {
 		});
 
 		tree_flows = new Tree(composite_2, SWT.BORDER | SWT.NO_FOCUS | SWT.NONE);
-		tree_flows.setBounds(0, 330, 185, 412);
+		tree_flows.setBounds(0, 211, 185, 219);
 		tree_flows.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem[] selection_switches = tree_switches.getSelection();
 				TreeItem[] selection_flows = tree_flows.getSelection();
 
-				if (selection_switches.length != 0
-						&& selection_flows.length != 0) {
+				if (selection_switches.length > 0
+						&& selection_flows.length > 0) {
 					if (!selection_flows[0].getText().equals(
 							"No Static Flows Set")) {
-						for (Flow flow : flows) {
-							if (flow.getName().equals(
-									selection_flows[0].getText())) {
-								populateFlowTable(flow);
-							}
-						}
+							populateFlowView(tree_flows.indexOf(selection_flows[0]));
 					}
 				}
 			}
@@ -408,7 +438,7 @@ public class StaticFlowManager {
 		lblSwitches.setText("Switches");
 
 		Label lblFlows = new Label(composite_2, SWT.NONE);
-		lblFlows.setBounds(0, 307, 70, 17);
+		lblFlows.setBounds(0, 188, 70, 17);
 		lblFlows.setText("Flows");
 
 		Composite composite_3 = new Composite(composite, SWT.NONE);
@@ -442,57 +472,45 @@ public class StaticFlowManager {
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					try {
-						if (flow != null) {
-							if (flow.getName() != null
-									|| !table_flow.getItems()[0].getText(1)
-											.isEmpty()) {
+				if (flow != null) {
+					if (flow.getName() != null
+							|| !txtFlowName.getText().equals("")) {
 
-								// Parse the changes made to the flow
-								flow = FlowManagerPusher
-										.parseTableChanges(table_flow
-												.getItems());
-
-								// Debugging
-								System.out.println(flow.serialize());
-
-								if(FlowToTable.errorChecksPassed(table_flow.getItems())){
-									
-								// Push the flow and get the response
-								String response = FlowManagerPusher.push(flow);
-
-								if (response.equals("Flow successfully pushed!")) {
-									populateFlowTree(tree_switches
-											.indexOf(tree_switches
-													.getSelection()[0]));
-									unsavedProgress = false;
-								}
-
-								disposeEditor();
-
-								// Display the response from pushing the flow
-								displayStatus(response);
-								}
-
-							} else {
-								// Error message in the event that the flow
-								// hasn't been given a name
-								displayError("Your flow must have a name");
-							}
+						if(FlowManagerPusher.errorChecksPassed(txtFlowPriority.getText())){
+						    
+						// Parse the changes made to the flow
+                        flow.setName(txtFlowName.getText());
+                        flow.setPriority(txtFlowPriority.getText());
+							
+						// Push the flow and get the response
+						String response;
+                        try {
+                            response = FlowManagerPusher.push(flow);
+                            if (response.equals("Flow successfully pushed down to switches")) {
+                                if(currSwitch != null){
+                                    populateFlowTree(tree_switches
+                                            .indexOf(tree_switches.getItem(currSwitchIndex)));
+                                }
+                                else{
+                                    populateSwitchTree();
+                                }
+                                
+                                disposeEditors("all");
+                                unsavedProgress = false;
+                            }
+                            DisplayMessage.displayStatus(shell,response);
+                        } catch (IOException | JSONException e1) {
+                            DisplayMessage.displayError(shell,"Problem occured while pushing flow, please view the log for details");
+                            e1.printStackTrace();
+                            }
 						}
-						// Error message in the event that the button is pushed
-						// and there is no flow to push
-						else {
-							displayError("You do not have a flow to push!");
-						}
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+
+					} else {
+						DisplayMessage.displayError(shell, "Your flow must have a name");
 					}
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				}
+				else {
+					DisplayMessage.displayError(shell, "You do not have a flow to push!");
 				}
 			}
 		});
@@ -513,30 +531,22 @@ public class StaticFlowManager {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (flow != null) {
-					try {
-						try {
-							String response = FlowManagerPusher.remove(flow);
-							// If successfully deleted, populate the flow tree
-							// with the new results
-							if (response.equals("Entry " + flow.getName()
-									+ " deleted"))
-								populateFlowTree(tree_switches
-										.indexOf(tree_switches.getSelection()[0]));
+					String response;
+                    try {
+                        response = FlowManagerPusher.remove(flow);
+                        if (response.equals("Entry " + flow.getName()
+                                + " deleted"))
+                            populateFlowTree(tree_switches
+                                    .indexOf(tree_switches.getSelection()[0]));
 
-							disposeEditor();
-
-							// Displays the response
-							displayStatus(response);
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					} catch (JSONException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+                        disposeEditors("all");
+                        DisplayMessage.displayStatus(shell, response);
+                    } catch (IOException | JSONException e1) {
+                        DisplayMessage.displayError(shell, "Problem occured while deleting flow. View the log for more details.");
+                        e1.printStackTrace();
+                    }		
 				} else {
-					displayError("You must select a flow to delete!");
+					DisplayMessage.displayError(shell, "You must select a flow to delete!");
 				}
 			}
 		});
@@ -545,6 +555,210 @@ public class StaticFlowManager {
 		Button btnDeleteAllFlows = new Button(composite_3, SWT.NONE);
 		btnDeleteAllFlows.setBounds(643, 3, 125, 29);
 		btnDeleteAllFlows.setText("Delete All Flows");
+		
+		Composite composite_4 = new Composite(composite, SWT.NONE);
+		composite_4.setBounds(210, 89, 178, 340);
+		
+		action_tree = new Tree(composite_4, SWT.BORDER);
+		action_tree.setBounds(0, 0, 178, 340);
+		action_tree.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+
+                disposeEditors("action");
+
+                // Populate the action table, if we actually have actions.
+                if (!action_tree.getSelection()[0].getText(0).equals("None Set"))
+                    populateActionTable(action_tree.indexOf(action_tree.getSelection()[0]));
+            }
+        });
+		
+		Composite composite_6 = new Composite(composite, SWT.NONE);
+		composite_6.setBounds(393, 90, 392, 339);
+		
+		action_table = new Table(composite_6, SWT.BORDER | SWT.FULL_SELECTION);
+		action_table.setLocation(0, 76);
+		action_table.setSize(392, 263);
+		action_table.setHeaderVisible(true);
+		action_table.setLinesVisible(true);
+		// Editor
+		actionEditor = new TableEditor(action_table);
+		actionEditor.horizontalAlignment = SWT.LEFT;
+		actionEditor.grabHorizontal = true;
+		actionEditor.minimumWidth = 50;
+
+        action_table.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+
+                disposeEditors("action");
+
+                // Identify the selected row
+                TableItem item = (TableItem) e.item;
+                if (item == null)
+                    return;
+
+                // The control that will be the editor must be a child of the
+                // Table
+                Text newEditor = new Text(action_table, SWT.NONE);
+                newEditor.setText(item.getText(EDITABLECOLUMN));
+                newEditor.addModifyListener(new ModifyListener() {
+                    @Override
+                    public void modifyText(ModifyEvent me) {
+                        Text text = (Text) actionEditor.getEditor();
+                        actionEditor.getItem()
+                                .setText(EDITABLECOLUMN, text.getText());
+                    }
+                });
+                newEditor.selectAll();
+                newEditor.setFocus();
+                actionEditor.setEditor(newEditor, item, EDITABLECOLUMN);
+            }
+        });
+		
+		TableColumn tblclmnParameter_1 = new TableColumn(action_table, SWT.NONE);
+		tblclmnParameter_1.setWidth(161);
+		tblclmnParameter_1.setText("Action Parameter");
+		
+		TableColumn tblclmnValue_1 = new TableColumn(action_table, SWT.NONE);
+		tblclmnValue_1.setWidth(226);
+		tblclmnValue_1.setText("Value");
+		
+		Button btnSave_1 = new Button(composite_6, SWT.NONE);
+		btnSave_1.setBounds(33, 10, 75, 25);
+		btnSave_1.setText("Save");
+		
+		Button btnRemove = new Button(composite_6, SWT.NONE);
+		btnRemove.setBounds(33, 41, 75, 25);
+		btnRemove.setText("Remove");
+		
+		combo = new Combo(composite_6, SWT.NONE);
+		combo.setBounds(277, 37, 91, 29);
+		combo.setItems(new String[] { "output", "enqueue", "strip-vlan",
+                "set-vlan-id", "set-vlan-priority", "set-src-mac",
+                "set-dst-mac", "set-tos-bits", "set-src-ip", "set-dst-ip",
+                "set-src-port", "set-dst-port" });
+		
+		Label lblNewAction = new Label(composite_6, SWT.NONE);
+		lblNewAction.setBounds(178, 41, 91, 15);
+		lblNewAction.setText("New Action :");
+		
+		Button btnRemoveAllActions = new Button(composite_6, SWT.NONE);
+		btnRemoveAllActions.setBounds(176, 10, 145, 25);
+		btnRemoveAllActions.setText("Remove All Actions");
+		btnRemoveAllActions.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                // Remove all the actions and refresh the action tree
+            	if(flow != null){
+                ActionManagerPusher.removeAllActions(flow);
+                populateActionTree();
+            	}
+            	else{
+            		DisplayMessage.displayError(shell, "You must select a flow or create a new one before modifying actions!");
+            	}
+            }
+        });
+		combo.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+
+                disposeEditors("action");
+                if(flow != null)
+                	setupAction(combo.getItem(combo.getSelectionIndex()));
+                else
+                	DisplayMessage.displayError(shell, "You must select a flow or create a new one before modifying actions!");
+            }
+        });
+		btnRemove.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                // Remove the action
+            	if(flow != null){
+	                if (currAction != null) {
+	                    ActionManagerPusher.removeAction(flow, currAction);
+	                    populateActionTree();
+	                }
+            	}
+            	else{
+            		DisplayMessage.displayError(shell,"You must select a flow or create a new one before modifying actions!");
+            	}
+            }
+        });
+		btnSave_1.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            	if(flow != null){
+	                if (currAction != null) {
+	                    if (!action_table.getItems()[0].getText(1).isEmpty()) {
+	                        if (ActionToTable.errorChecksPassed(
+	                                currSwitch, currAction,
+	                                action_table.getItems())) {
+	                            ActionManagerPusher.addAction(
+	                                    action_table.getItems(), currAction, flow);
+	
+	                            disposeEditors("action");
+	                            populateActionTree();
+	                        }
+	                    } else {
+	                        DisplayMessage.displayError(shell, "You must enter a value before you save an action!");
+	                    }
+	                } else {
+	                    DisplayMessage.displayError(shell, "You must create an action to save!");
+	                }
+            	}
+            	else{
+            		DisplayMessage.displayError(shell, "You must select a flow or create a new one before modifying actions!");
+            	}
+            }
+        });
+		
+		Composite composite_8 = new Composite(composite, SWT.NONE);
+		composite_8.setBounds(791, 89, 387, 339);
+		
+		match_table = new Table(composite_8, SWT.BORDER | SWT.FULL_SELECTION);
+		match_table.setLocation(0, 0);
+		match_table.setSize(387, 339);
+		match_table.setHeaderVisible(true);
+		match_table.setLinesVisible(true);
+		matchEditor = new TableEditor(match_table);
+        matchEditor.horizontalAlignment = SWT.LEFT;
+        matchEditor.grabHorizontal = true;
+        matchEditor.minimumWidth = 50;
+        match_table.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+
+                disposeEditors("match");
+
+                // Identify the selected row
+                TableItem item = (TableItem) e.item;
+                if (item == null)
+                    return;
+
+                // The control that will be the editor must be a child of the
+                // Table
+                Text newEditor = new Text(match_table, SWT.NONE);
+                newEditor.setText(item.getText(EDITABLECOLUMN));
+                newEditor.addModifyListener(new ModifyListener() {
+                    public void modifyText(ModifyEvent me) {
+                        Text text = (Text) matchEditor.getEditor();
+                        matchEditor.getItem()
+                                .setText(EDITABLECOLUMN, text.getText());
+                    }
+                });
+                newEditor.selectAll();
+                newEditor.setFocus();
+                matchEditor.setEditor(newEditor, item, EDITABLECOLUMN);
+            }
+        });
+		
+		TableColumn tblclmnParameter = new TableColumn(match_table, SWT.NONE);
+		tblclmnParameter.setWidth(176);
+		tblclmnParameter.setText("Match Parameter");
+		
+		TableColumn tblclmnValue = new TableColumn(match_table, SWT.NONE);
+		tblclmnValue.setWidth(168);
+		tblclmnValue.setText("Value");
 		btnDeleteAllFlows.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -555,26 +769,27 @@ public class StaticFlowManager {
 				messageBox
 						.setMessage("Are you sure you wish to delete all flows?");
 				if (messageBox.open() == SWT.YES) {
-					try {
-						// Delete all the flows for the current switch, populate
-						// the table with the new information
-						FlowManagerPusher.deleteAll(currSwitch.getDpid());
-						populateFlowTree(tree_switches.indexOf(tree_switches
-								.getSelection()[0]));
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (JSONException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					// Delete all the flows for the current switch, populate
+					// the table with the new information
+				    if(currSwitch != null){
+						try {
+                            FlowManagerPusher.deleteAll(currSwitch.getDpid());
+                            populateFlowTree(tree_switches.indexOf(tree_switches
+                                    .getSelection()[0]));
+                        } catch (IOException | JSONException e1) {
+                            DisplayMessage.displayError(shell, "Problem ocurred deleting all flows, view the log for details.");
+                            e1.printStackTrace();
+                        }
+				    }
+				    else{
+				        DisplayMessage.displayError(shell, "You must select a switch before deleting all of its flows!");
+				    }
 				}
 			}
 		});
-
-		// Populate the switch tree with the current switches on the network on
-		// construction
 		populateSwitchTree();
+		if(FloodlightProvider.getSwitches(false).isEmpty())
+            FloodlightProvider.getSwitches(true);
 		shell.setLayout(gl_shell);
 	}
 }

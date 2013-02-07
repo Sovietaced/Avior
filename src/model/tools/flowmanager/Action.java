@@ -4,55 +4,60 @@ public class Action {
 
 	String type, param, value;
 
-	public Action(String t) {
-
+	public Action(String t){
+	    
+	    this.type = t;
+	    
 		if (t.equals("output"))
 			this.param = "Port";
-		if (t.equals("enqueue"))
+		else if (t.equals("enqueue"))
 			this.param = "Port:Queue ID";
-		if (t.equals("set-vlan-id"))
+		else if (t.equals("strip-vlan"))
+		    this.param = "STRIP_VLAN";
+		else if (t.equals("set-vlan-id"))
 			this.param = "VLAN ID";
-		if (t.equals("set-vlan-priority"))
+		else if (t.equals("set-vlan-priority"))
 			this.param = "VLAN PCP";
-		if (t.equals("set-src-mac"))
+		else if (t.equals("set-src-mac"))
 			this.param = "Data Layer Address";
-		if (t.equals("set-dst-mac"))
+		else if (t.equals("set-dst-mac"))
 			this.param = "Data Layer Address";
-		if (t.equals("set-tos-bits"))
+		else if (t.equals("set-tos-bits"))
 			this.param = "Network Type Of Service";
-		if (t.equals("set-src-ip"))
+		else if (t.equals("set-src-ip"))
 			this.param = "Network Address";
-		if (t.equals("set-dst-ip"))
+		else if (t.equals("set-dst-ip"))
 			this.param = "Network Address";
-		if (t.equals("set-src-port"))
+		else if (t.equals("set-src-port"))
 			this.param = "Transport Port";
-		if (t.equals("set-dst-port"))
+		else 
 			this.param = "Transport Port";
-		this.type = t;
 	}
 
-	public Action(String t, String v) {
+	public Action(String t, String v){
 		if (t.equals("output"))
 			this.param = "Port";
-		if (t.equals("enqueue"))
+		else if (t.equals("enqueue"))
 			this.param = "Port:Queue ID";
-		if (t.equals("set-vlan-id"))
+		else if (t.equals("strip-vlan"))
+            this.param = "STRIP_VLAN";
+		else if (t.equals("set-vlan-id"))
 			this.param = "VLAN ID";
-		if (t.equals("set-vlan-priority"))
+		else if (t.equals("set-vlan-priority"))
 			this.param = "VLAN PCP";
-		if (t.equals("set-src-mac"))
+		else if (t.equals("set-src-mac"))
 			this.param = "Data Layer Address";
-		if (t.equals("set-dst-mac"))
+		else if (t.equals("set-dst-mac"))
 			this.param = "Data Layer Address";
-		if (t.equals("set-tos-bits"))
+		else if (t.equals("set-tos-bits"))
 			this.param = "Network Type Of Service";
-		if (t.equals("set-src-ip"))
+		else if (t.equals("set-src-ip"))
 			this.param = "Network Address";
-		if (t.equals("set-dst-ip"))
+		else if (t.equals("set-dst-ip"))
 			this.param = "Network Address";
-		if (t.equals("set-src-port"))
+		else if (t.equals("set-src-port"))
 			this.param = "Transport Port";
-		if (t.equals("set-dst-port"))
+		else
 			this.param = "Transport Port";
 
 		this.type = t;

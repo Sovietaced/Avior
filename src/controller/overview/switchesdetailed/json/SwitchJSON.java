@@ -1,4 +1,4 @@
-package controller.overview.switches.json;
+package controller.overview.switchesdetailed.json;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,15 +7,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import view.Gui;
-
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
 
 public class SwitchJSON {
 
 	private final static int THREADS = Runtime.getRuntime().availableProcessors();
     public static ExecutorService executor = Executors.newFixedThreadPool(THREADS);
-	public static String IP = Gui.IP;
+	public static String IP = FloodlightProvider.getIP();
     
 	public static Future<Object> startSwitchRestCalls(final String dpid, final boolean update) {
         Future<Object> future = executor.submit(new Callable<Object>() {

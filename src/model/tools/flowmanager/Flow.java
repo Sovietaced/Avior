@@ -7,10 +7,12 @@ public class Flow {
 
 	String name, priority, cookie, idleTimeOut, hardTimeOut, outPort, sw,
 			durationSeconds, packetCount, byteCount;
-	List<Action> actions = new ArrayList<Action>();
-	Match match = new Match();
+	List<Action> actions;
+	Match match;
 
 	public Flow() {
+	    match = new Match();
+	    actions = new ArrayList<Action>();
 	}
 
 	public Flow(String selectedSwitch) {
@@ -64,15 +66,10 @@ public class Flow {
 	}
 
 	public void setPriority(String priority) {
-		this.priority = priority;
-	}
-
-	public String getCookie() {
-		return cookie;
-	}
-
-	public void setCookie(String cookie) {
-		this.cookie = cookie;
+	    if(priority.equals("32767"))
+	        this.priority = "";
+	    else   
+	        this.priority = priority;
 	}
 
 	public String getIdleTimeOut() {
@@ -90,15 +87,7 @@ public class Flow {
 	public void setHardTimeOut(String hardTimeOut) {
 		this.hardTimeOut = hardTimeOut;
 	}
-
-	public String getOutPort() {
-		return outPort;
-	}
-
-	public void setOutPort(String outPort) {
-		this.outPort = outPort;
-	}
-
+	
 	public List<Action> getActions() {
 		return this.actions;
 	}
@@ -143,30 +132,10 @@ public class Flow {
 			serial = serial.concat("\"name\":\"" + name + "\"");
 		}
 		serial = serial.concat(", \"active\":\"true\"");
-		if (cookie != null) {
-			if (serial.length() > 15)
-				serial = serial.concat(", ");
-			serial = serial.concat("\"cookie\":\"" + cookie + "\"");
-		}
-		if (priority != null) {
+		if (priority != null && !priority.equals("")) {
 			if (serial.length() > 15)
 				serial = serial.concat(", ");
 			serial = serial.concat("\"priority\":\"" + priority + "\"");
-		}
-		if (idleTimeOut != null) {
-			if (serial.length() > 15)
-				serial = serial.concat(", ");
-			serial = serial.concat("\"idleTimout\":\"" + idleTimeOut + "\"");
-		}
-		if (hardTimeOut != null) {
-			if (serial.length() > 15)
-				serial = serial.concat(", ");
-			serial = serial.concat("\"hardTimeout\":\"" + hardTimeOut + "\"");
-		}
-		if (outPort != null) {
-			if (serial.length() > 15)
-				serial = serial.concat(", ");
-			serial = serial.concat("\"outPort\":\"" + outPort + "\"");
 		}
 		if (!actions.isEmpty()) {
 			if (serial.length() > 15)
@@ -193,11 +162,11 @@ public class Flow {
 	}
 	
 	public boolean equals(Flow otherFlow) {
-		if(!this.actionsToString().equals(otherFlow.actionsToString()))
-				return false;
-		if(!this.getMatch().Serialize().equals(otherFlow.getMatch().Serialize()))
-			return false;
-	    
-	    return true;
+		if(this.match.Serialize().equals(otherFlow.match.Serialize())
+			&& this.actionsToString().equals(otherFlow.actionsToString())
+			&& this.priority.equals(otherFlow.priority))
+			return true;
+		
+		return false;
 	}
 }

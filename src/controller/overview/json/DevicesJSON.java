@@ -8,6 +8,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
 import controller.util.JSONArray;
 import controller.util.JSONException;
@@ -15,11 +16,9 @@ import controller.util.JSONObject;
 
 import model.overview.DeviceSummary;
 
-import view.Gui;
-
 public class DevicesJSON {
 
-	static String IP = Gui.IP;
+	static String IP = FloodlightProvider.getIP();
 	static JSONObject obj;
 
 	public static List<DeviceSummary> getDeviceSummaries() throws JSONException {

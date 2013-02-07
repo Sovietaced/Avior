@@ -23,4 +23,20 @@ public class ErrorCheck {
 				+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 				+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 	}
+	
+	public static boolean isIPandSubnet(String ipSub){
+	    String[] split = ipSub.split("/");
+        if(!isIP(split[0])){
+            return false;
+        }
+        if(split.length > 1){
+            if(Integer.valueOf(split[1]) < 0 || Integer.valueOf(split[1]) > 32){
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+        return true;
+	}
 }

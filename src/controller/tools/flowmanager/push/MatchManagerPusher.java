@@ -13,8 +13,13 @@ public class MatchManagerPusher {
 			match.setDataLayerDestination(items[0].getText(1));
 		if (!items[1].getText(1).isEmpty())
 			match.setDataLayerSource(items[1].getText(1));
-		if (!items[2].getText(1).isEmpty())
-			match.setDataLayerType(items[2].getText(1));
+		if (!items[2].getText(1).isEmpty()){
+		    // Check and see if they entere it as a hex value (ie. 0x800)
+		    if(!items[2].getText(1).contains("x"))
+		        match.setDataLayerType(String.valueOf(Integer.parseInt(items[2].getText(1),16)));
+		    else
+		        match.setDataLayerType(items[2].getText(1));
+		}
 		if (!items[3].getText(1).isEmpty())
 			match.setDataLayerVLAN(items[3].getText(1));
 		if (!items[4].getText(1).isEmpty())
@@ -35,6 +40,9 @@ public class MatchManagerPusher {
 			match.setTransportSource(items[11].getText(1));
 		if (!items[12].getText(1).isEmpty())
 			match.setWildcards(items[12].getText(1));
+		
+		if((match.getNetworkDestination() != null || match.getNetworkSource() != null) && match.getDataLayerType() == null)
+		    match.setDataLayerType("0x0800");
 
 		return match;
 	}

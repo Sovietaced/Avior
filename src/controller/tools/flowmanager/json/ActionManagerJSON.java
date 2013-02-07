@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Action;
 
-import view.Gui;
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
 import controller.util.HexString;
 import controller.util.JSONArray;
@@ -22,7 +22,7 @@ import controller.util.JSONObject;
 
 public class ActionManagerJSON {
 
-	static String IP = Gui.IP;
+	static String IP = FloodlightProvider.getIP();
 	static JSONObject obj;
 	static JSONArray json;
 	static Future<Object> future;
@@ -54,6 +54,7 @@ public class ActionManagerJSON {
 			for (int i = 0; i < json.length(); i++) {
 				obj = json.getJSONObject(i);
 				String objActionType = obj.getString("type");
+				try {
 				if (objActionType.equals("OUTPUT")) {
 					actions.add(new Action("output", String.valueOf(obj
 							.getInt("port")), "Port"));
@@ -62,7 +63,7 @@ public class ActionManagerJSON {
 							.getInt("port") + ":" + obj.getInt("queueId")),
 							"Port:Queue ID"));
 				} else if (objActionType.equals("STRIP_VLAN")) {
-					actions.add(new Action("strip-vlan", ""));
+                        actions.add(new Action("strip-vlan", ""));
 				} else if (objActionType.equals("SET_VLAN_ID")) {
 					actions.add(new Action("set-vlan-id", String.valueOf(obj
 							.getInt("virtualLanIdentifier")), "VLAN ID"));
@@ -120,6 +121,10 @@ public class ActionManagerJSON {
 					actions.add(new Action("set-dst-port", String.valueOf(obj
 							.getInt("transportPort")), "Transport Port"));
 				}
+				 } catch (Exception e) {
+                     // TODO Auto-generated catch block
+                     e.printStackTrace();
+                 }
 			}
 		}
 		return actions;

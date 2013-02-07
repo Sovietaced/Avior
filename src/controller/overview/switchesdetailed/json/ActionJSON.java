@@ -1,4 +1,4 @@
-package controller.overview.switches.json;
+package controller.overview.switchesdetailed.json;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import model.tools.flowmanager.Action;
 
-import view.Gui;
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.HexString;
 import controller.util.JSONArray;
 import controller.util.JSONException;
@@ -17,7 +17,7 @@ import controller.util.JSONObject;
 
 public class ActionJSON {
 
-	static String IP = Gui.IP;
+	static String IP = FloodlightProvider.getIP();
 	static JSONObject obj;
 	static JSONArray json;
 
@@ -29,6 +29,7 @@ public class ActionJSON {
 			for (int i = 0; i < json.length(); i++) {
 				obj = json.getJSONObject(i);
 				String objActionType = obj.getString("type");
+				try{
 				if (objActionType.equals("OUTPUT")) {
 					actions.add(new Action("output", String.valueOf(obj
 							.getInt("port")), "Port"));
@@ -95,6 +96,9 @@ public class ActionJSON {
 					actions.add(new Action("set-dst-port", String.valueOf(obj
 							.getInt("transportPort")), "Transport Port"));
 			}
+				}catch(Exception e1){
+				    e1.printStackTrace();
+				}
 		}
 		return actions;
 	}

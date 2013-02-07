@@ -38,13 +38,13 @@ public class FirewallJSON {
 			e1.printStackTrace();
 		}
 		if (obj != null) {
-			if(obj.getString("result") == "firewall enabled")
+			if(obj.getString("result").equals("firewall enabled"))
 				return true;
 		}
 		return false;
 	}
 	
-	public static boolean enable(boolean enable) throws JSONException{
+	public static String enable(boolean enable) throws JSONException{
 		
 		if(enable){
 			future = Deserializer.readJsonObjectFromURL("http://" + IP
@@ -63,10 +63,10 @@ public class FirewallJSON {
 				e1.printStackTrace();
 			}
 			if (obj != null) {
-				if(obj.getString("status") == "success")
-					return true;
+				if(obj.getString("status").equals("success"))
+					return obj.getString("status");
 				else
-					return false;
+					return null;
 			}
 		}
 		else{
@@ -86,13 +86,12 @@ public class FirewallJSON {
 				e1.printStackTrace();
 			}
 			if (obj != null) {
-				if(obj.getString("status") == "success")
-					return true;
+				if(obj.getString("status").equals("success"))
+					return obj.getString("status");
 				else
-					return false;
+					return null;
 			}
 		}
-		//default return
-		return false;
+		return null;
 	}
 }

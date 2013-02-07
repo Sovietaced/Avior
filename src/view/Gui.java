@@ -33,8 +33,8 @@ import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 import view.tools.flowmanager.StaticFlowManager;
 import view.tools.firewall.Firewall;
 
+import controller.floodlightprovider.FloodlightProvider;
 import controller.overview.json.ControllerJSON;
-import controller.overview.switches.json.SwitchesJSON;
 import controller.overview.table.DeviceToTable;
 import controller.overview.table.FlowToTable;
 import controller.overview.table.PortToTable;
@@ -43,20 +43,18 @@ import controller.util.JSONException;
 
 public class Gui {
 
-	protected Shell shell;
-	protected Table devices_table, table_ports, table_flows, table,
-			switches_table;
-	protected Composite controllerOverview, detailed_switch;
-	protected Label lblInsertHostname, lblInsertHealthy, lblInsertJvmMemory,
-			lblInsertModules, lblSn, lblHardware, lblSoftware, lblManufacturer;
-	protected TreeItem trtmSwitches, trtmDevices;
-	protected Switch currSwitch;
-	protected boolean dispose;
-	public static boolean switchesLoaded;
-	protected Display display;
+	private Shell shell;
+	private Table devices_table, table_ports, table_flows;
+	private static Table switches_table;
+	private Composite controllerOverview, detailed_switch;
+	private Label lblInsertHostname, lblInsertHealthy, lblInsertJvmMemory,
+	lblInsertModules, lblSn, lblHardware, lblSoftware, lblManufacturer;
+	private TreeItem trtmSwitches, trtmDevices;
+	private static Switch currSwitch;
+	private static boolean switchesLoaded;
+	private Display display;
 	public static String IP;
-	static List<Switch> switches = new ArrayList<Switch>();
-	static List<String> controllerInfo = new ArrayList<String>();
+	private static List<String> controllerInfo = new ArrayList<String>();
 
 	/**
 	 * Launch the application.
@@ -80,32 +78,21 @@ public class Gui {
 		// If the window is closed, stop the entire application.
 		display.dispose();
 	}
-	
-	public void displayError(String msg){
-		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR
-				| SWT.OK);
+
+	public void displayError(String msg) {
+		MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 		mb.setText("Error!");
 		mb.setMessage(msg);
 		mb.open();
-	}	
-
-	public static List<Switch> getSwitches() {
-		return switches;
-	}
-	
-	public static void loadSwitches() {
-		try {
-			switches = SwitchesJSON.getSwitches();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
-	// This will continue to update the live screen showing the switch data
+	/**
+	 * This updates information for a specific switch when viewing detailed
+	 * display
+	 * 
+	 * @param sw
+	 *            The switch we are viewing and updating
+	 */
 	private void liveUpdate(final Switch sw) {
 		Thread thread = new Thread() {
 			public void run() {
@@ -126,6 +113,9 @@ public class Gui {
 		thread.start();
 	}
 
+	/**
+	 * Loads all controller overview related info
+	 */
 	private void displayControllerInfo() {
 		try {
 			controllerInfo = ControllerJSON.getControllerInfo();
@@ -134,7 +124,7 @@ public class Gui {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// Check to see that all the controller information is here
+
 		if (controllerInfo.size() == 4) {
 			lblInsertHostname.setText(controllerInfo.get(0));
 			lblInsertHealthy.setText(controllerInfo.get(1));
@@ -145,92 +135,87 @@ public class Gui {
 		}
 	}
 
+	/**
+	 * Loads and displays device overview info
+	 */
 	private void displayDevicesData() {
-		// Clears the table prior to populating it with data
+
 		devices_table.removeAll();
-		
-			for (String[] data : DeviceToTable.deviceSummariesToTable()) {
-				new TableItem(devices_table, SWT.NONE).setText(data);
-			}
+
+		for (String[] data : DeviceToTable.deviceSummariesToTable()) {
+			new TableItem(devices_table, SWT.NONE).setText(data);
+		}
 	}
 
-	// This gets all the information switches on the network
-	private void updateSwitchesData() {
+	/**
+	 * Gets all data about switches known by the controller
+	 */
+	public static void loadSwitchesData() {
+
+		if (switchesLoaded == false)
+			switchesLoaded = true;
+
 		// Since we are updating the data, clear the table
 		switches_table.removeAll();
 		// No single switch is selected so set the current switch to null
 		currSwitch = null;
-		// Attempt to get the switches via JSON
-		try {
-			switches = SwitchesJSON.getSwitches();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
-	// This loads the switches tab with the DPIDs of all the switches
-	// TODO make a single function to only get the DPIDS so it's faster!
-	private void loadSwitchesTree() {
-		// No single switch is selected to set the current switch to null
+	/**
+	 * Populates the switches tree with switch DPIDs
+	 */
+	private void populateSwitchesTree() {
+		// No single switch is selected so set the current switch to null
 		currSwitch = null;
-		// Get the most recent information about the switches
-		updateSwitchesData();
 		// Clear the tree before we populate it with fresh information
 		trtmSwitches.removeAll();
+
 		// If there are switches and the tree is not disposed, populate it
-		if (!switches.isEmpty() && trtmSwitches != null) {
-			for (Switch sw : switches) {
+		if (trtmSwitches != null) {
+			for (Switch sw : FloodlightProvider.getSwitches(true)) {
 				new TreeItem(trtmSwitches, SWT.NONE).setText(sw.getDpid());
 			}
 		}
 	}
 
-	// This gets information about all the switches.
-	private void loadSwitchesData() {
-		
-		if(switchesLoaded == false)
-			switchesLoaded = true;
-		// Get the most recent data about the switches
-		updateSwitchesData();
-		
-		for (String[] data : SwitchToTable.getSwitchTableFormat(switches)) {
+	/**
+	 * This loads and displays information about all the switches
+	 */
+	private void displaySwitchesData() {
+
+		loadSwitchesData();
+		populateSwitchesTree();
+
+		for (String[] data : SwitchToTable.getSwitchTableFormat(FloodlightProvider.getSwitches(true))) {
 			new TableItem(switches_table, SWT.NONE).setText(data);
 		}
-			
+
 		shell.setText("Overview for all switches");
 	}
 
-	// This specifically loads information about a switch's ports. This allows
-	// for a faster response in the GUI
-	private void loadSwitchData(Switch sw){
-		// Clear the tables of any old information
+	/**
+	 * Loads a specific switch's data, optimized for updating detailed view
+	 * 
+	 * @param sw
+	 *            The switch we wish to update
+	 */
+	private void loadSwitchData(Switch sw) {
+		
 		table_ports.removeAll();
-		// Clear the tables of any old information
 		table_flows.removeAll();
 		// Set the current switch the to switch selected
 		currSwitch = sw;
 
-		// Try to get the up to date information about this switch
-			try {
-				SwitchesJSON.updateSwitch(sw);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		sw = FloodlightProvider.getSwitch(sw.getDpid(), true);
 
+		for (String[] data : FlowToTable.getFlowTableFormat(sw.getFlows())) {
+			new TableItem(table_flows, SWT.NONE).setText(data);
+		}
 
-			for (String[] data : FlowToTable.getFlowTableFormat(sw.getFlows())) {
-				new TableItem(table_flows, SWT.NONE).setText(data);
-			}
-		
-			for (String[] data : PortToTable.getPortTableFormat(sw.getPorts())) {
-				new TableItem(table_ports, SWT.NONE).setText(data);
-			}
-			
+		for (String[] data : PortToTable.getPortTableFormat(sw.getPorts())) {
+			new TableItem(table_ports, SWT.NONE).setText(data);
+		}
+
 		shell.setText("Overview for switch : " + sw.getDpid());
 		lblManufacturer.setText("Manufacturer : "
 				+ sw.getManufacturerDescription());
@@ -285,13 +270,13 @@ public class Gui {
 		GroupLayout gl_shell = new GroupLayout(shell);
 		gl_shell.setHorizontalGroup(gl_shell.createParallelGroup(
 				GroupLayout.TRAILING).add(GroupLayout.LEADING, composite,
-				GroupLayout.DEFAULT_SIZE, 1198, Short.MAX_VALUE));
+						GroupLayout.DEFAULT_SIZE, 1198, Short.MAX_VALUE));
 		gl_shell.setVerticalGroup(gl_shell.createParallelGroup(
 				GroupLayout.LEADING).add(
-				gl_shell.createSequentialGroup()
+						gl_shell.createSequentialGroup()
 						.add(composite, GroupLayout.PREFERRED_SIZE, 752,
 								GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(36, Short.MAX_VALUE)));
+								.addContainerGap(36, Short.MAX_VALUE)));
 		composite.setLayout(new FormLayout());
 
 		final Composite composite_1 = new Composite(composite, SWT.NONE);
@@ -328,8 +313,7 @@ public class Gui {
 					if (selection[0].getText().equals("Switches")) {
 						stackLayout.topControl = switches_table;
 						composite_1.layout();
-						loadSwitchesTree();
-						loadSwitchesData();
+						displaySwitchesData();
 					}
 
 					// Handler for Controller tree item
@@ -346,11 +330,11 @@ public class Gui {
 						displayDevicesData();
 					}
 
-					// Handler for Flow Manager tree item
-					else if (selection[0].getText().equals("Flow Manager")) {
+					// Handler for Static Flow Manager tree item
+					else if (selection[0].getText().equals("Static Flow Manager")) {
 						new StaticFlowManager();
 					}
-					
+
 					// Handler for Flow Manager tree item
 					else if (selection[0].getText().equals("Firewall")) {
 						new Firewall();
@@ -361,7 +345,7 @@ public class Gui {
 						System.out.println("Feature not available yet!");
 						// new FirewallManager();
 					} else if (selection[0].getText().length() == 23) {
-						for (Switch sw : switches) {
+						for (Switch sw : FloodlightProvider.getSwitches(false)) {
 							if (sw.getDpid().equals(selection[0].getText())) {
 								loadSwitchData(sw);
 								liveUpdate(sw);
@@ -395,17 +379,17 @@ public class Gui {
 		trtmTools.setText("Tools");
 
 		TreeItem trtmFlowManager = new TreeItem(trtmTools, SWT.NONE);
-		trtmFlowManager.setText("Flow Manager");
-		
+		trtmFlowManager.setText("Static Flow Manager");
+
 		TreeItem trtmFirewall = new TreeItem(trtmTools, SWT.NONE);
 		trtmFirewall.setText("Firewall");
-		
+
 		TreeItem trtmQos = new TreeItem(trtmTools, SWT.NONE);
 		trtmQos.setText("QoS");
-		
+
 		TreeItem trtmVirtualnetworkfilter = new TreeItem(trtmTools, SWT.NONE);
 		trtmVirtualnetworkfilter.setText("VirtualNetworkFilter");
-		
+
 		TreeItem trtmLoadbalancer = new TreeItem(trtmTools, SWT.NONE);
 		trtmLoadbalancer.setText("LoadBalancer");
 		trtmTools.setExpanded(true);
@@ -414,25 +398,25 @@ public class Gui {
 		switches_table.setHeaderVisible(true);
 		switches_table.setLinesVisible(true);
 		final Menu switchMenu = new Menu(switches_table);
-	      switches_table.setMenu(switchMenu);
-	      switchMenu.addMenuListener(new MenuAdapter() {
-	         public void menuShown(MenuEvent e) {
-	            // Get rid of existing menu items
-	            MenuItem[] items = switchMenu.getItems();
-	            for (int i = 0; i < items.length; i++) {
-	               ((MenuItem) items[i]).dispose();
-	            }
-	            // Add menu items for current selection
-	            MenuItem newItem = new MenuItem(switchMenu, SWT.NONE);
-	            newItem.setText("Manage Flows");
-	            newItem.addSelectionListener(new SelectionAdapter(){
-	            	public void widgetSelected(SelectionEvent e){
-	            		new StaticFlowManager(switches_table.indexOf(switches_table.getSelection()[0]));
-	            	}
-	            });
-	         }
-	      });
-
+		switches_table.setMenu(switchMenu);
+		switchMenu.addMenuListener(new MenuAdapter() {
+			public void menuShown(MenuEvent e) {
+				// Get rid of existing menu items
+				MenuItem[] items = switchMenu.getItems();
+				for (int i = 0; i < items.length; i++) {
+					((MenuItem) items[i]).dispose();
+				}
+				// Add menu items for current selection
+				MenuItem newItem = new MenuItem(switchMenu, SWT.NONE);
+				newItem.setText("Manage Flows");
+				newItem.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						new StaticFlowManager(switches_table
+								.indexOf(switches_table.getSelection()[0]));
+					}
+				});
+			}
+		});
 
 		TableColumn tableColumn_1 = new TableColumn(switches_table, SWT.NONE);
 		tableColumn_1.setWidth(50);
@@ -633,16 +617,16 @@ public class Gui {
 		lblPorts.setText("Ports");
 		fd_composite_2.bottom = new FormAttachment(0, 710);
 		composite_2.setLayoutData(fd_composite_2);
-		
+
 		Button btnManageFlows = new Button(detailed_switch, SWT.NONE);
 		btnManageFlows.setBounds(837, 80, 110, 29);
 		btnManageFlows.setText("Manage Flows");
-		btnManageFlows.addSelectionListener(new SelectionAdapter(){
-		public void widgetSelected(SelectionEvent e){
-			new StaticFlowManager(switches.indexOf(currSwitch));
-		}
-	});
-		
+		btnManageFlows.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				new StaticFlowManager(FloodlightProvider.getSwitches(false).indexOf(currSwitch));
+			}
+		});
+
 		switchesLoaded = false;
 		stackLayout.topControl = controllerOverview;
 		composite_1.layout(true);

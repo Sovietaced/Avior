@@ -1,9 +1,6 @@
 package controller.tools.firewall.json;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -12,11 +9,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import model.tools.firewall.Rule;
-import model.tools.flowmanager.Action;
 
 import view.Gui;
 import controller.util.Deserializer;
-import controller.util.HexString;
 import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;
@@ -47,22 +42,23 @@ public class RuleJSON {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 			for (int i = 0; i < json.length(); i++) {
 				obj = json.getJSONObject(i);
 				Rule rule = new Rule();
 				rule.setRuleid(obj.getInt("ruleid"));
-				rule.setDpid(obj.getLong("dpid"));
-				rule.setIn_port((short)(obj.getInt("in_port")));
-				rule.setDl_src(obj.getLong("dl_src"));
-				rule.setDl_dst(obj.getLong("dl_dst"));
-				rule.setDl_type((short)(obj.getInt("dl_type")));
-				rule.setNw_src_prefix(obj.getInt("nw_src_prefix"));
-				rule.setNw_src_maskbits(obj.getInt("nw_src_maskbits"));
-				rule.setNw_dst_prefix(obj.getInt("nw_dst_prefix"));
-				rule.setNw_dst_maskbits(obj.getInt("nw_dst_maskbits"));
-				rule.setNw_proto((short)(obj.getInt("nw_proto")));
-				rule.setTp_src((short)(obj.getInt("tp_src")));
-				rule.setTp_dst((short)(obj.getInt("tp_dst")));
+				rule.setDpid(obj.getString("dpid"));
+				rule.setIn_port(String.valueOf((obj.getInt("in_port"))));
+				rule.setDl_src(obj.getString("dl_src"));
+				rule.setDl_dst(obj.getString("dl_dst"));
+				rule.setDl_type(String.valueOf((short)(obj.getInt("dl_type"))));
+				rule.setNw_src_prefix(obj.getString("nw_src_prefix"));
+				rule.setNw_src_maskbits(String.valueOf(obj.getInt("nw_src_maskbits")));
+				rule.setNw_dst_prefix(obj.getString("nw_dst_prefix"));
+				rule.setNw_dst_maskbits(String.valueOf(obj.getInt("nw_dst_maskbits")));
+				rule.setNw_proto(String.valueOf((short)(obj.getInt("nw_proto"))));
+				rule.setTp_src(String.valueOf((short)(obj.getInt("tp_src"))));
+				rule.setTp_dst(String.valueOf((short)(obj.getInt("tp_dst"))));
 				rule.setWildcard_dpid(obj.getBoolean("wildcard_dpid"));
 				rule.setWildcard_in_port(obj.getBoolean("wildcard_in_port"));
 				rule.setWildcard_dl_src(obj.getBoolean("wildcard_dl_src"));
@@ -73,7 +69,7 @@ public class RuleJSON {
 				rule.setWildcard_nw_proto(obj.getBoolean("wildcard_nw_proto"));
 				rule.setWildcard_tp_src(obj.getBoolean("wildcard_tp_src"));
 				rule.setWildcard_tp_dst(obj.getBoolean("wildcard_tp_dst"));
-				rule.setPriority(obj.getInt("priority"));
+				rule.setPriority(String.valueOf(obj.getInt("priority")));
 				rule.setAction(obj.getString("action"));			
 				rules.add(rule);
 		}

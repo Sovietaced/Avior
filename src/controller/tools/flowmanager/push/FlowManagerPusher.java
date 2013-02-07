@@ -10,20 +10,19 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import org.eclipse.swt.widgets.TableItem;
-
-import controller.overview.switches.json.FlowJSON;
+import controller.floodlightprovider.FloodlightProvider;
+import controller.util.ErrorCheck;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
 import model.tools.flowmanager.Flow;
 
-import view.Gui;
 import view.tools.flowmanager.StaticFlowManager;
+import view.util.DisplayMessage;
 
 public class FlowManagerPusher {
 
-	static String IP = Gui.IP;
+	static String IP = FloodlightProvider.getIP();
 
 	public static String push(Flow flow) throws IOException, JSONException {
 
@@ -37,6 +36,7 @@ public class FlowManagerPusher {
 		URLConnection conn = url.openConnection();
 		conn.setDoOutput(true);
 		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+		System.out.println(flow.serialize());
 		wr.write(flow.serialize());
 		wr.flush();
 
@@ -56,16 +56,19 @@ public class FlowManagerPusher {
 		// Make sure the static flow pusher throws no errors
 		if (json.getString("status").equals("Entry pushed") || json.getString("status").equals(warning)) {
 			// Get actual flows, we pass null as first parameter to denote that we are not supplying a JSON object
-			List<Flow> actualFlows = FlowJSON.getFlows(null,flow.getSwitch());
+			List<Flow> actualFlows = FloodlightProvider.getRealFlows(flow.getSwitch(), true);
 			// Compare the flow you just pushed with those actually on the switch
 			// If found, success message printed.
 			for (Flow actualFlow : actualFlows) {
+			    System.out.println("actual" + actualFlow.serialize());
+			    System.out.println("flow" + flow.serialize());
 				if (flow.equals(actualFlow)) {
-					return "Flow successfully pushed!";
+					return "Flow successfully pushed down to switches";
 				}
 			}
 			// If not found give user guidance
-			return "Flow was dropped by the switch. Check your controller log for more details.";
+			return "Flow pushed but not recognized on any switches. It may have been dropped by the switch of modified by the static flow pusher on the controller." +
+					" Check your controller log for more details.";
 		} else {
 			return json.getString("status");
 		}
@@ -115,13 +118,14 @@ public class FlowManagerPusher {
 		@SuppressWarnings("unused")
 		InputStream is = conn.getInputStream();
 	}
-
-	public static Flow parseTableChanges(TableItem[] items) {
-		Flow flow = StaticFlowManager.getFlow();
-		if (!items[0].getText(1).isEmpty())
-			flow.setName(items[0].getText(1));
-		if (!items[3].getText(1).isEmpty())
-			flow.setPriority(items[3].getText(1));
-		return flow;
-	}
+	
+	// Checks the entries for valid values
+    public static boolean errorChecksPassed(String p){
+                if(!p.equals("") && !ErrorCheck.isNumeric(p)){
+                    DisplayMessage.displayError(StaticFlowManager.getShell(),"Priority must be a valid number.");
+                    return false;
+                }
+                else 
+                    return true;
+        }
 }

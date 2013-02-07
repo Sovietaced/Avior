@@ -8,8 +8,7 @@ import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Match;
 
-import view.Gui;
-
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
 import controller.util.JSONArray;
 import controller.util.JSONException;
@@ -23,7 +22,7 @@ public class MatchManagerJSON {
 			networkSourceMaskLength, networkTypeOfService,
 			transportDestination, transportSource, wildcards;
 
-	private static String IP = Gui.IP;
+	static String IP = FloodlightProvider.getIP();
 	static JSONObject obj;
 	static JSONArray json;
 	static Future<Object> future;

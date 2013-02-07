@@ -9,17 +9,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
 import controller.util.FormatLong;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
-import view.Gui;
-
 
 public class ControllerJSON {
 
-	static String IP = Gui.IP;
+    static String IP = FloodlightProvider.getIP();
 	static JSONObject obj;
 	static Future<Object> futureHealth,futureModules,futureMemory;
 

@@ -1,4 +1,4 @@
-package controller.overview.switches.json;
+package controller.overview.switchesdetailed.json;
 
 import java.io.IOException;
 
@@ -25,7 +25,7 @@ public class MatchJSON {
 		
 		Match match = new Match();
 		
-		// Here we check the values, if they are default we set them emptry strings.
+		// Here we check the values, if they are default we set them empty strings.
 		// This way they don't confuse the user into thinking they set something
 		// they didn't
 		if (!obj.getString("dataLayerDestination").equals("00:00:00:00:00:00"))
@@ -40,7 +40,7 @@ public class MatchJSON {
 		if (obj.getInt("dataLayerVirtualLanPriorityCodePoint") != 0)
 			match.setDataLayerPCP(String.valueOf(obj
 					.getInt("dataLayerVirtualLanPriorityCodePoint")));
-		if (obj.getInt("inputPort") != 0 || obj.getInt("inputPort") != 1)
+		if (obj.getInt("inputPort") != 0)
 			match.setInputPort(String.valueOf(obj.getInt("inputPort")));
 		if (!obj.getString("networkDestination").equals("0.0.0.0"))
 			match.setNetworkDestination(obj.getString("networkDestination"));

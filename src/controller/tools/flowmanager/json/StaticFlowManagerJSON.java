@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 
 import model.tools.flowmanager.Flow;
 
-import view.Gui;
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
 import controller.util.JSONArray;
 import controller.util.JSONException;
@@ -19,7 +19,7 @@ import controller.util.JSONObject;
 
 public class StaticFlowManagerJSON {
 
-	static String IP = Gui.IP;
+	static String IP = FloodlightProvider.getIP();
 	static JSONObject jsonobj, obj;
 	static JSONArray json;
 	static Future<Object> future;
@@ -64,20 +64,10 @@ public class StaticFlowManagerJSON {
 						flow.setActions(ActionManagerJSON.getActions(sw, key));
 						// Get the match
 						flow.setMatch(MatchManagerJSON.getMatch(sw, key));
-						if (obj.getInt("priority") != 32767)
-							flow.setPriority(String.valueOf(obj
+						flow.setPriority(String.valueOf(obj
 									.getInt("priority")));
-						flow.setCookie(String.valueOf(obj.getLong("cookie")));
-						if (obj.getInt("idleTimeout") != 0)
-							flow.setIdleTimeOut(String.valueOf(obj
-									.getInt("idleTimeout")));
-						if (obj.getInt("hardTimeout") != 0)
-							flow.setHardTimeOut(String.valueOf(obj
-									.getInt("hardTimeout")));
-						if (obj.getInt("outPort") != -1)
-							flow.setOutPort(String.valueOf(obj
-									.getInt("outPort")));
 						flows.add(flow);
+						System.out.println(flow.serialize());
 						}
 					}
 				} catch (Exception e) {
