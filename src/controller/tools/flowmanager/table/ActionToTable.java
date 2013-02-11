@@ -66,8 +66,8 @@ public class ActionToTable {
 	public static boolean errorChecksPassed(Switch sw, Action action,
 			TableItem[] items) {
 
-		List<Port> ports = sw.getPorts();
 		boolean checkPorts = false;
+		
 		if (action.getType().equals("output") || action.getType().equals("set-vlan-id")
 				|| action.getType().equals("set-vlan-priority")
 				|| action.getType().equals("set-tos-bits")
@@ -103,7 +103,8 @@ public class ActionToTable {
 			}
 		}
 
-		if (checkPorts) {	
+		if (checkPorts) {
+		    List<Port> ports = sw.getPorts();
 		    for(Port p : ports){
 		        if(p.getPortNumber().equals(items[0].getText(1))){
 		            return true;

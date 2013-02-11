@@ -51,7 +51,7 @@ public class StaticFlowManager {
 	final int EDITABLECOLUMN = 1;
 	private static Switch currSwitch;
 	private static Flow flow;
-	protected static boolean unsavedProgress;
+	protected static boolean unsavedProgress, newFlow;
 	private Table action_table;
 	private Table match_table;
 	private Text txtFlowName;
@@ -126,6 +126,7 @@ public class StaticFlowManager {
         txtFlowPriority.setText("");
 		flow = null;
 		currSwitch = null;
+		newFlow = false;
 		
 		// Update and check if switches exist
 		if (!FloodlightProvider.getSwitches(true).isEmpty()) {		
@@ -147,6 +148,7 @@ public class StaticFlowManager {
 		match_table.removeAll();
 		txtFlowName.setText("");
         txtFlowPriority.setText("");
+        newFlow = false;
 		
         currSwitchIndex = index;
 		currSwitch = FloodlightProvider.getSwitches(false).get(currSwitchIndex);
@@ -174,6 +176,7 @@ public class StaticFlowManager {
 
 		flow = FloodlightProvider.getStaticFlows(currSwitch.getDpid(), false).get(index);
         txtFlowName.setText(flow.getName());
+        newFlow = false;
         if(flow.getPriority() != null)
             txtFlowPriority.setText(flow.getPriority());
         
@@ -191,6 +194,7 @@ public class StaticFlowManager {
     		flow = new Flow(currSwitch.getDpid());
     		txtFlowName.setText("");
     	    txtFlowPriority.setText("");
+    	    newFlow = true;
     	    
     	    populateActionTree();
             populateMatchTable();
@@ -530,7 +534,7 @@ public class StaticFlowManager {
 		btnDeleteFlow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (flow != null) {
+				if (flow != null && newFlow == false) {
 					String response;
                     try {
                         response = FlowManagerPusher.remove(flow);

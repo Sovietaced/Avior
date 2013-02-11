@@ -50,8 +50,6 @@ public class MatchToTable {
 	// Checks the entries for valid values, also checks if port entries are
 	// valid
 	public static boolean errorChecksPassed(Switch sw, TableItem[] items) {
-
-		List<Port> ports = sw.getPorts();
 		boolean checkPorts = false;
 
 		if (!items[0].getText(1).isEmpty()
@@ -120,8 +118,9 @@ public class MatchToTable {
 		}
 
 		if (checkPorts) {
+		    List<Port> ports = sw.getPorts();
 		    for(Port p : ports){
-                if(p.getPortNumber().equals(items[0].getText(1))){
+                if(p.getPortNumber().equals(items[5].getText(1))){
                     return true;
                 }
             }
