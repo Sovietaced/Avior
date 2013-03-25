@@ -22,10 +22,11 @@ import controller.util.JSONObject;
 
 public class ActionManagerJSON {
 
-	static String IP = FloodlightProvider.getIP();
-	static JSONObject obj;
-	static JSONArray json;
-	static Future<Object> future;
+	private static String IP = FloodlightProvider.getIP();
+	private static String PORT = FloodlightProvider.getPort();
+	private static JSONObject obj;
+	private static JSONArray json;
+	private static Future<Object> future;
 
 	// This parses JSON from the restAPI to get all the actions and values for that action by it's flow name
 	public static List<Action> getActions(String dpid, String flowName)
@@ -34,7 +35,7 @@ public class ActionManagerJSON {
 		List<Action> actions = new ArrayList<Action>();
 		// Get the array of actions
 		future = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/staticflowentrypusher/list/" + dpid + "/json");
+				+ ":" + PORT + "/wm/staticflowentrypusher/list/" + dpid + "/json");
 		try {
 			obj = (JSONObject) future.get(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e1) {

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import view.Gui;
-
 import controller.overview.switchesdetailed.json.FlowJSON;
 import controller.overview.switchesdetailed.json.SwitchesJSON;
 import controller.tools.firewall.json.RuleJSON;
@@ -21,6 +19,7 @@ public class FloodlightProvider {
     private static List<Switch> switches = new ArrayList<Switch>();
     private static List<Flow> staticFlows = new ArrayList<Flow>();
     private static List<Flow> realFlows = new ArrayList<Flow>();
+    private static String IP, PORT = "8080";
     
     /**
      * 
@@ -112,6 +111,18 @@ public class FloodlightProvider {
     }
     
     public static String getIP(){
-        return Gui.IP;
+        return IP;
+    }
+    
+    public static void setIP(String IPAddress){
+    	IP = IPAddress; 
+    }
+    
+    public static String getPort(){
+    	return PORT;
+    }
+    
+    public static void setPort(String ControllerPort){
+    	PORT = ControllerPort;
     }
 }

@@ -45,7 +45,7 @@ public class Gui {
 
 	private Shell shell;
 	private Table devices_table, table_ports, table_flows;
-	private static Table switches_table;
+	private Table switches_table;
 	private Composite controllerOverview, detailed_switch;
 	private Label lblInsertHostname, lblInsertHealthy, lblInsertJvmMemory,
 	lblInsertModules, lblSn, lblHardware, lblSoftware, lblManufacturer;
@@ -53,14 +53,13 @@ public class Gui {
 	private static Switch currSwitch;
 	private static boolean switchesLoaded;
 	private Display display;
-	public static String IP;
 	private static List<String> controllerInfo = new ArrayList<String>();
 
 	/**
 	 * Launch the application.
 	 */
 	public Gui(String controllerIP) {
-		IP = controllerIP;
+		FloodlightProvider.setIP(controllerIP);
 		open();
 	}
 
@@ -150,7 +149,7 @@ public class Gui {
 	/**
 	 * Gets all data about switches known by the controller
 	 */
-	public static void loadSwitchesData() {
+	public void loadSwitchesData() {
 
 		if (switchesLoaded == false)
 			switchesLoaded = true;

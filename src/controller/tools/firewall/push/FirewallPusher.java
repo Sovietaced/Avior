@@ -22,14 +22,15 @@ import model.tools.firewall.Rule;
 
 public class FirewallPusher {
     
-    static String IP = FloodlightProvider.getIP();
-    static String jsonResponse;
+    private static String IP = FloodlightProvider.getIP();
+    private static String PORT = FloodlightProvider.getPort();
+    private static String jsonResponse;
     
     public static String push(Rule rule) throws IOException, JSONException{
         
         jsonResponse = "";
         URL url = new URL("http://" + IP
-                + ":8080/wm/firewall/rules/json");
+                + ":" + PORT + "/wm/firewall/rules/json");
         
         URLConnection conn = url.openConnection();
         conn.setDoOutput(true);
@@ -71,7 +72,7 @@ public class FirewallPusher {
         jsonResponse = "";
 
         URL url = new URL("http://" + IP
-                + ":8080/wm/firewall/rules/json");
+                + ":" + PORT + "/wm/firewall/rules/json");
         HttpURLConnection connection = null;
         connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");

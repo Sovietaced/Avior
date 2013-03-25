@@ -6,25 +6,23 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-
-import view.Gui;
+import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
-import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
 public class FirewallJSON {
 
-	static String IP = Gui.IP;
-	static JSONObject obj;
-	static JSONArray json;
-	static Future<Object> future;
+	private static String IP = FloodlightProvider.getIP();
+	private static String PORT = FloodlightProvider.getPort();
+	private static JSONObject obj;
+	private static Future<Object> future;
 
 	public static boolean isEnabled()
 			throws JSONException, IOException {
 
 		future = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/firewall/module/status/json");
+				+ ":" + PORT + "/wm/firewall/module/status/json");
 		try {
 			obj = (JSONObject) future.get(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e1) {
@@ -48,7 +46,7 @@ public class FirewallJSON {
 		
 		if(enable){
 			future = Deserializer.readJsonObjectFromURL("http://" + IP
-					+ ":8080/wm/firewall/module/enable/json");
+					+ ":" + PORT + "/wm/firewall/module/enable/json");
 			
 			try {
 				obj = (JSONObject) future.get(5, TimeUnit.SECONDS);
@@ -71,7 +69,7 @@ public class FirewallJSON {
 		}
 		else{
 			future = Deserializer.readJsonObjectFromURL("http://" + IP
-					+ ":8080/wm/firewall/module/disable/json");
+					+ ":" + PORT + "/wm/firewall/module/disable/json");
 			
 			try {
 				obj = (JSONObject) future.get(5, TimeUnit.SECONDS);

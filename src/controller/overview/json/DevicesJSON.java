@@ -18,8 +18,9 @@ import model.overview.DeviceSummary;
 
 public class DevicesJSON {
 
-	static String IP = FloodlightProvider.getIP();
-	static JSONObject obj;
+	private static String IP = FloodlightProvider.getIP();
+	private static String PORT = FloodlightProvider.getPort();
+	private static JSONObject obj;
 
 	public static List<DeviceSummary> getDeviceSummaries() throws JSONException {
 
@@ -29,7 +30,7 @@ public class DevicesJSON {
 		// objects for each one
 		try {
 			Future<Object> devices = Deserializer.readJsonArrayFromURL("http://" + IP
-					+ ":8080/wm/device/");
+					+ ":" + PORT + "/wm/device/");
 			JSONArray json = (JSONArray) devices.get(5, TimeUnit.SECONDS);
 			for (int i = 0; i < json.length(); i++) {
 				obj = json.getJSONObject(i);

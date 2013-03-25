@@ -18,9 +18,10 @@ import controller.util.JSONObject;
 
 public class ControllerJSON {
 
-    static String IP = FloodlightProvider.getIP();
-	static JSONObject obj;
-	static Future<Object> futureHealth,futureModules,futureMemory;
+    private static String IP = FloodlightProvider.getIP();
+    private static String PORT = FloodlightProvider.getPort();
+	private static JSONObject obj;
+	private static Future<Object> futureHealth,futureModules,futureMemory;
 
 	public static List<String> getControllerInfo() throws JSONException, IOException {
 
@@ -31,11 +32,11 @@ public class ControllerJSON {
 
 		// Start threads that make calls to the restAPI
 		futureHealth = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/core/health/json");
+				+ ":" + PORT + "/wm/core/health/json");
 		futureMemory = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/core/memory/json");
+				+ ":" + PORT + "/wm/core/memory/json");
 		futureModules = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/core/module/loaded/json");
+				+ ":" + PORT + "/wm/core/module/loaded/json");
 		
 		// HEALTH
 		try {

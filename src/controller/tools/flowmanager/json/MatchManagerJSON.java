@@ -10,7 +10,6 @@ import model.tools.flowmanager.Match;
 
 import controller.floodlightprovider.FloodlightProvider;
 import controller.util.Deserializer;
-import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;
 
@@ -22,10 +21,10 @@ public class MatchManagerJSON {
 			networkSourceMaskLength, networkTypeOfService,
 			transportDestination, transportSource, wildcards;
 
-	static String IP = FloodlightProvider.getIP();
-	static JSONObject obj;
-	static JSONArray json;
-	static Future<Object> future;
+	private static String IP = FloodlightProvider.getIP();
+	private static String PORT = FloodlightProvider.getPort();
+	private static JSONObject obj;
+	private static Future<Object> future;
 
 	// This parses JSON from the restAPI to get the match of a flow and all it's values
 	public static Match getMatch(String dpid, String flowName)
@@ -33,7 +32,7 @@ public class MatchManagerJSON {
 		Match match = new Match();
 		// Get the match object
 		future = Deserializer.readJsonObjectFromURL("http://" + IP
-				+ ":8080/wm/staticflowentrypusher/list/" + dpid + "/json");
+				+ ":" + PORT + "/wm/staticflowentrypusher/list/" + dpid + "/json");
 		try {
 			obj = (JSONObject) future.get(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
