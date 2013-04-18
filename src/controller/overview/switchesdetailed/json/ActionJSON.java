@@ -10,7 +10,6 @@ import java.util.List;
 import model.tools.flowmanager.Action;
 
 import controller.floodlightprovider.FloodlightProvider;
-import controller.util.HexString;
 import controller.util.JSONArray;
 import controller.util.JSONException;
 import controller.util.JSONObject;
@@ -49,13 +48,11 @@ public class ActionJSON {
 							"VLAN PCP"));
 				} else if (objActionType.equals("SET_DL_SRC")) {
 					String dl = obj.getString("dataLayerAddress");
-					actions.add(new Action("set-src-mac", String
-							.valueOf(HexString.toHexString(dl.getBytes())),
+					actions.add(new Action("set-src-mac", dl,
 							"Data Layer Address"));
 				} else if (objActionType.equals("SET_DL_DST")) {
 					String dl = obj.getString("dataLayerAddress");
-					actions.add(new Action("set-dst-mac", String
-							.valueOf(HexString.toHexString(dl.getBytes())),
+					actions.add(new Action("set-dst-mac", dl,
 							"Data Layer Address"));
 				} else if (objActionType.equals("SET_NW_TOS")) {
 					actions.add(new Action("set-tos-bits", String.valueOf(obj
