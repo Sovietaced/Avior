@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
@@ -29,11 +30,20 @@ public class Deserializer {
 		return sb.toString();
 	}
 	
-	public static Future<Object> readJsonArrayFromURL(final String url){
+	public static Future<Object> readJsonArrayFromURL(final String surl){
 		 final Future<Object> future = executor.submit(new Callable<Object>(){
            public Object call() {
        		try {
-       			InputStream is = new URL(url).openStream();
+       			URL url = new URL(surl);
+    			HttpURLConnection connection = null;
+    			connection = (HttpURLConnection) url.openConnection();
+    			connection.setRequestMethod("GET");
+    			// We have to override the post method so we can send data
+    			connection.setRequestProperty("Accept", "application/json");
+    			connection.setDoOutput(true);
+
+    			// Send request
+    			InputStream is = connection.getInputStream();
        			BufferedReader rd = new BufferedReader(new InputStreamReader(is,
        					Charset.forName("UTF-8")));
        			String jsonText = readAll(rd);
@@ -54,11 +64,20 @@ public class Deserializer {
 		return future;
 	}
 	
-	public static Future<Object> readJsonObjectFromURL(final String url){
+	public static Future<Object> readJsonObjectFromURL(final String surl){
 		 final Future<Object> future = executor.submit(new Callable<Object>(){
             public Object call() {
         		try {
-        			InputStream is = new URL(url).openStream();
+        			URL url = new URL(surl);
+        			HttpURLConnection connection = null;
+        			connection = (HttpURLConnection) url.openConnection();
+        			connection.setRequestMethod("GET");
+        			// We have to override the post method so we can send data
+        			connection.setRequestProperty("Accept", "application/json");
+        			connection.setDoOutput(true);
+
+        			// Send request
+        			InputStream is = connection.getInputStream();
         			BufferedReader rd = new BufferedReader(new InputStreamReader(is,
         					Charset.forName("UTF-8")));
         			String jsonText = readAll(rd);
