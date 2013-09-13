@@ -62,5 +62,10 @@ About
 
 Avior is developed by Jason Parraga, with help from Ryan Flaherty, for the Marist Openflow Research project. To report bugs, post suggestions, or any other inquiries, please visit http://openflow.marist.edu/
 
-Floodlight is an Apache licensed, Java based OpenFlow controller originally written by David Erickson at Stanford University.
+Floodlight is an Apache licensed, Java based OpenFlow controller originally written by David Erickson at Stanford Univ
+
+License
+-----
+Licensed under the The MIT License (MIT)
+Copyright (c) 2013 Jason Parraga
 
